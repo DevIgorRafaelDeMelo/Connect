@@ -9,8 +9,14 @@ app.use(cors());
 app.use(express.json());
 
 const agenda = require("./seguimento/agenda");
+const comfirmagendamento = require("./seguimento/comfirmagendamento");
+const login = require("./seguimento/login");
+const agendamentos = require("./seguimento/agendamentos");
 
 app.post("/agenda", agenda);
+app.post("/comfirmagendamento", comfirmagendamento);
+app.post("/login", login);
+app.post("/agendamentos", agendamentos);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
