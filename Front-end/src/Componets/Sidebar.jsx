@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 function Sidebar() {
   return (
-    <aside className="w-64 bg-gradient-to-b from-blue-900 to-blue-700 text-white p-6 shadow-lg">
+    <aside className="w-[30vh] bg-gradient-to-b from-blue-900 to-blue-700 text-white p-6 shadow-lg fixed top-0 h-full">
       <h1 className="text-3xl font-extrabold mb-10 text-center tracking-wide">
         Painel Admin
       </h1>

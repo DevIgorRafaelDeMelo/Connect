@@ -1,25 +1,29 @@
-const express = require("express");
-const router = express.Router();
-const authMiddleware = require("../mid/authMiddleware");
 const db = require("../server/db");
 
-router.post("/", authMiddleware, async (req, res) => {
-  console.log("Token recebido:", req.headers.authorization);
-  console.log("oi");
+const agendamentos = async (req, res) => {
   try {
-    const query = `
-      SELECT ID, EMPRESA_ID, CLIENTE_NOME, TELEFONE, CPF,
-             ATENDIMENTO_DESCRICAO, TIPO_SERVICO, DATA_ATENDIMENTO,
-             HORA_INICIO, HORA_FIM, STATUS, CRIADO_EM
-      FROM connect.agenda
-    `;
-    const [rows] = await db.query(query);
-    console.log(rows);
-    res.json(rows);
-  } catch (error) {
-    console.error("Erro ao buscar agendamentos:", error);
-    res.status(500).json({ erro: "Erro ao buscar agendamentos" });
-  }
-});
+    const [results] = await db.execute(`
+      SELECT 
+        agenda.ID,
+        agenda.EMPRESA_ID,
+        agenda.CLIENTE_NOME,
+        agenda.TELEFONE,
+        agenda.CPF,
+        agenda.ATENDIMENTO_DESCRICAO,
+        agenda.TIPO_SERVICO,
+        agenda.DATA_ATENDIMENTO,
+        agenda.HORA_INICIO,
+        agenda.HORA_FIM,
+        agenda.STATUS,
+        agenda.CRIADO_EM
+      FROM connect.agenda;
+    `);
 
-module.exports = router;
+    res.json(results);
+  } catch (error) {
+    console.error("Erro ao consultar agendamentos:", error);
+    res.status(500).json({ erro: "Erro ao consultar agendamentos" });
+  }
+};
+
+module.exports = agendamentos;
