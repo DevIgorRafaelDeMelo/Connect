@@ -4,6 +4,8 @@ import Admin from "./Admin";
 import AdminPainel from "./AdminPainel";
 import Dashbord from "./Pages/Dashbord";
 import { Navigate } from "react-router-dom";
+import Agendamentos from "./Pages/Agendamentos";
+import ClientePage from "./Pages/ClientePage";
 
 function App() {
   return (
@@ -23,6 +25,22 @@ function App() {
         element={
           <RotaProtegida>
             <Dashbord />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/Agendamentos"
+        element={
+          <RotaProtegida>
+            <Agendamentos />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/cliente/:id"
+        element={
+          <RotaProtegida>
+            <ClientePage />
           </RotaProtegida>
         }
       />
