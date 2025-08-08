@@ -32,7 +32,19 @@ async function getClientsByCPF(cpf) {
   }
 }
 
+async function getClients(cpf) {
+  try {
+    const [rows] = await db.query("SELECT  * FROM clientes ");
+
+    return rows;
+  } catch (error) {
+    console.error("Erro ao buscar clientes por CPF:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   getClientByID,
   getClientsByCPF,
+  getClients,
 };

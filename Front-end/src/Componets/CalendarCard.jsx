@@ -27,7 +27,7 @@ const CalendarCard = ({ month, year, days, agenda }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ID:1,
+          ID: 1,
           nome: formData.nome,
           telefone: formData.telefone,
           cpf: formData.cpf,
@@ -188,7 +188,7 @@ const CalendarCard = ({ month, year, days, agenda }) => {
 
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1 text-black">
-                  Telefone:
+                  CPF:
                 </label>
                 <input
                   className="block text-sm font-medium mb-1 text-black"
@@ -202,7 +202,7 @@ const CalendarCard = ({ month, year, days, agenda }) => {
 
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1 text-black">
-                  CPF:
+                  Telefone:
                 </label>
                 <input
                   className="block text-sm font-medium mb-1 text-black"
@@ -246,31 +246,38 @@ const CalendarCard = ({ month, year, days, agenda }) => {
         </div>
       )}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative m-4">
-            <h3 className="text-xl font-semibold mb-4 text-center text-black">
-              Confirmar Dados do Agendamento
+        <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative m-4 border border-gray-200">
+            <h3 className="text-2xl font-bold text-center text-blue-800 mb-6">
+              📋 Confirmar Agendamento
             </h3>
 
-            <ul className="text-black space-y-2">
+            <ul className="text-gray-700 space-y-3 text-sm">
               <li>
-                <strong>Nome:</strong> {formData.nome}
+                <span className="font-semibold text-gray-900">👤 Nome:</span>{" "}
+                {formData.nome}
               </li>
               <li>
-                <strong>Telefone:</strong> {formData.telefone}
+                <span className="font-semibold text-gray-900">
+                  📞 Telefone:
+                </span>{" "}
+                {formData.telefone}
               </li>
               <li>
-                <strong>CPF:</strong> {formData.cpf}
+                <span className="font-semibold text-gray-900">🆔 CPF:</span>{" "}
+                {formData.cpf}
               </li>
               <li>
-                <strong>Serviço:</strong> {formData.tipoServico}
+                <span className="font-semibold text-gray-900">💈 Serviço:</span>{" "}
+                {formData.tipoServico}
               </li>
               <li>
-                <strong>Horário:</strong> {selectedTime?.slice(0, 5)}
+                <span className="font-semibold text-gray-900">⏰ Horário:</span>{" "}
+                {selectedTime?.slice(0, 5)}
               </li>
             </ul>
 
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-end gap-3 mt-8">
               <button
                 onClick={() => {
                   submitAgendamento({
@@ -287,15 +294,15 @@ const CalendarCard = ({ month, year, days, agenda }) => {
                     },
                   });
                 }}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
-                Confirmar
+                ✅ Confirmar
               </button>
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
               >
-                Editar
+                ✏️ Editar
               </button>
             </div>
           </div>

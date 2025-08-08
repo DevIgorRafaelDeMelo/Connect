@@ -1,4 +1,5 @@
 const db = require("../server/db");
+const { cadastroCliente } = require("../controllers/CadastroCliente");
 
 const comfirmagendamento = async (req, res) => {
   try {
@@ -40,6 +41,8 @@ const comfirmagendamento = async (req, res) => {
       status,
       criadoEm,
     ];
+
+    cadastroCliente({ nome, cpf, telefone });
 
     await db.execute(query, values);
 

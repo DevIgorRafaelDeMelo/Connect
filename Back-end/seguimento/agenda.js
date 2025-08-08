@@ -1,6 +1,6 @@
 const db = require("../server/db");
 
-const agenda = async (req, res) => {
+const agenda = async (req, res) => { 
   const empresaId = req.body.ID;
   try {
     const [results] = await db.query(

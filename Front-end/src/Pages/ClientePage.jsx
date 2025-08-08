@@ -79,29 +79,55 @@ function ClientePage() {
           Histórico de Agendamentos
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
-          {registros.map((registro) => (
-            <div
-              key={registro.ID}
-              className="border rounded-lg p-4 shadow-sm bg-white"
-            >
-              <p>
-                <strong>Serviço:</strong> {registro.TIPO_SERVICO}
-              </p>
-              <p>
-                <strong>Data:</strong>{" "}
-                {new Date(registro.DATA_ATENDIMENTO).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Hora:</strong> {registro.HORA_INICIO} -{" "}
-                {registro.HORA_FIM}
-              </p>
-              <p>
-                <strong>Status:</strong> {registro.STATUS}
-              </p>
-            </div>
-          ))}
-        </div>
+        <table className="min-w-full divide-y divide-blue-100">
+          <thead className="bg-blue-50">
+            <tr>
+              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
+                Serviço
+              </th>
+              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
+                Data
+              </th>
+              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
+                Hora
+              </th>
+              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {registros.map((registro) => (
+              <tr
+                key={registro.ID}
+                className="border-b hover:bg-blue-50 cursor-pointer"
+              >
+                <td className="px-4 py-2">{registro.TIPO_SERVICO}</td>
+                <td className="px-4 py-2">
+                  {new Date(registro.DATA_ATENDIMENTO).toLocaleDateString(
+                    "pt-BR"
+                  )}
+                </td>
+                <td className="px-4 py-2">
+                  {registro.HORA_INICIO} - {registro.HORA_FIM}
+                </td>
+                <td className="px-4 py-2">
+                  <span
+                    className={`font-medium ${
+                      registro.STATUS === "Concluído"
+                        ? "text-green-600"
+                        : registro.STATUS === "Cancelado"
+                        ? "text-red-600"
+                        : "text-yellow-600"
+                    }`}
+                  >
+                    {registro.STATUS}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </section>
   );

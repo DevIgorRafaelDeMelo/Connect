@@ -6,6 +6,8 @@ import Dashbord from "./Pages/Dashbord";
 import { Navigate } from "react-router-dom";
 import Agendamentos from "./Pages/Agendamentos";
 import ClientePage from "./Pages/ClientePage";
+import Clientes from "./Pages/Clientes";
+import Empresa from "./Pages/Empresa";
 
 function App() {
   return (
@@ -41,6 +43,22 @@ function App() {
         element={
           <RotaProtegida>
             <ClientePage />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/clientes"
+        element={
+          <RotaProtegida>
+            <Clientes />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/Empresa"
+        element={
+          <RotaProtegida>
+            <Empresa />
           </RotaProtegida>
         }
       />

@@ -1,6 +1,6 @@
 const db = require("../server/db");
 
-const agendamentos = async (req, res) => {
+const agendamentos = async (req, res) => { 
   try {
     const [results] = await db.execute(`
       SELECT 
