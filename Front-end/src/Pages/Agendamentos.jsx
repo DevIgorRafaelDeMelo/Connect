@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
-import InfoCard from "../Componets/InfoCard";
-import { Bar } from "react-chartjs-2";
+import React, { useEffect, useState } from "react"; 
 import {
   Chart as ChartJS,
   CategoryScale,

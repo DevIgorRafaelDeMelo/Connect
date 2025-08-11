@@ -8,6 +8,8 @@ import Agendamentos from "./Pages/Agendamentos";
 import ClientePage from "./Pages/ClientePage";
 import Clientes from "./Pages/Clientes";
 import Empresa from "./Pages/Empresa";
+import Servicos from "./Pages/Servicos";
+import Colaboradores from "./Pages/Colaboradores";
 
 function App() {
   return (
@@ -59,6 +61,22 @@ function App() {
         element={
           <RotaProtegida>
             <Empresa />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/Servicos"
+        element={
+          <RotaProtegida>
+            <Servicos />
+          </RotaProtegida>
+        }
+      />
+       <Route
+        path="/Colaboradores"
+        element={
+          <RotaProtegida>
+            <Colaboradores />
           </RotaProtegida>
         }
       />

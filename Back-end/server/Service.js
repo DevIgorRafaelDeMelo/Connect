@@ -43,8 +43,30 @@ async function getClients(cpf) {
   }
 }
 
+async function getServicos() {
+  try {
+    const [rows] = await db.query("SELECT  * FROM tipos_servico ");
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getColaboradores() {
+  try {
+    const [rows] = await db.query("SELECT  * FROM funcionarios ");
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getClientByID,
   getClientsByCPF,
   getClients,
+  getServicos,
+  getColaboradores,
 };
