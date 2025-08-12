@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import Admin from "./Admin";
 import AdminPainel from "./AdminPainel";
-import Dashbord from "./Pages/Dashbord";
+import Dashbord from "./Pages/Dashbord.JSX";
 import { Navigate } from "react-router-dom";
 import Agendamentos from "./Pages/Agendamentos";
 import ClientePage from "./Pages/ClientePage";
@@ -10,6 +10,8 @@ import Clientes from "./Pages/Clientes";
 import Empresa from "./Pages/Empresa";
 import Servicos from "./Pages/Servicos";
 import Colaboradores from "./Pages/Colaboradores";
+import ClientePageDados from "./Pages/ClienteDados";
+import Pendencias from "./Pages/Pendencias";
 
 function App() {
   return (
@@ -72,11 +74,28 @@ function App() {
           </RotaProtegida>
         }
       />
-       <Route
+      <Route
         path="/Colaboradores"
         element={
           <RotaProtegida>
             <Colaboradores />
+          </RotaProtegida>
+        }
+      />
+
+      <Route
+        path="/ClientePageDados/:cpf"
+        element={
+          <RotaProtegida>
+            <ClientePageDados />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/Pendencias"
+        element={
+          <RotaProtegida>
+            <Pendencias />
           </RotaProtegida>
         }
       />

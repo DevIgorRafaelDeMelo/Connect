@@ -7,8 +7,6 @@ router.put("/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const { NOME, CARGO, ATIVO } = req.body;
 
-  console.log(ATIVO);
-
   const query = `
     UPDATE funcionarios
     SET NOME = ?, CARGO = ?,  STATUS = ?

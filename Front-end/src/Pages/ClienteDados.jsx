@@ -1,43 +1,20 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Sidebar from "../Componets/Sidebar";
-import PopupConfirmacao from "../Componets/Popup";
 
-function ClientePage() {
-  const { id } = useParams();
+function ClientePageDados() {
+  const { cpf } = useParams();
   const [cliente, setCliente] = useState(null);
   const [registros, setRegistros] = useState([]);
-  const [mostrarPopup, setMostrarPopup] = useState(false);
-  const [msg, setMsg] = useState("");
-
-  const handleConfirmar = async (id, status) => {
-    try {
-      const res = await fetch(`http://localhost:5000/AtualizaStatus/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ATIVO: status }),
-      });
-
-      const data = await res.json();
-
-      setMsg(data.message);
-      setMostrarPopup(true);
-    } catch (error) {
-      console.error("Erro ao atualizar status:", error);
-      setMsg("Erro ao atualizar serviço");
-      setMostrarPopup(true);
-    }
-  };
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchCliente = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/clientes/${id}`);
+        const res = await fetch(`http://localhost:5000/clientes/${cpf}`);
         const data = await res.json();
+        console.log(data);
         if (isMounted) {
           setCliente(data.atendimento);
           setRegistros(data.registros);
@@ -52,7 +29,7 @@ function ClientePage() {
     return () => {
       isMounted = false;
     };
-  }, [id, msg]);
+  }, [cpf]);
 
   if (!cliente) return <p>Carregando...</p>;
 
@@ -64,7 +41,7 @@ function ClientePage() {
           Dados do Cliente
         </h1>
 
-        <div className="grid grid-cols-3 md:grid-cols-3 gap-6 mb-10">
+        <div className="  mb-10">
           <div>
             <strong>Nome:</strong> {cliente.CLIENTE_NOME}
           </div>
@@ -76,40 +53,7 @@ function ClientePage() {
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-blue-800 pb-6 ">Agendado</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6 border rounded-lg p-4 shadow-sm bg-white">
-          <div key={cliente.ID} className="flex flex-col justify-center">
-            <p>
-              <strong>Serviço:</strong> {cliente.TIPO_SERVICO}
-            </p>
-            <p>
-              <strong>Data:</strong>
-              {new Date(cliente.DATA_ATENDIMENTO).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>Hora:</strong> {cliente.HORA_INICIO} - {cliente.HORA_FIM}
-            </p>
-            <p>
-              <strong>Status:</strong> {cliente.STATUS}
-            </p>
-          </div>
-
-          <div className="flex items-center justify-center md:justify-end gap-4 pe-20">
-            <button
-              onClick={() => handleConfirmar(cliente.ID, "REALIZADO")}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow-sm transition"
-            >
-              Confirmar
-            </button>
-            <button
-              onClick={() => handleConfirmar(cliente.ID, "CANCELADO")}
-              className="bg-gray-400 hover:bg-gray-500 text-white font-semibold px-6 py-2 rounded shadow-sm transition"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
+         
 
         <h2 className="text-2xl font-bold text-blue-800 pb-6">
           Histórico de Agendamentos
@@ -165,14 +109,8 @@ function ClientePage() {
           </tbody>
         </table>
       </div>
-      {mostrarPopup && (
-        <PopupConfirmacao
-          mensagem={msg}
-          onClose={() => setMostrarPopup(false)}
-        />
-      )}
     </section>
   );
 }
 
-export default ClientePage;
+export default ClientePageDados;

@@ -1,9 +1,11 @@
 import Sidebar from "../Componets/Sidebar";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [busca, setBusca] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -29,9 +31,9 @@ function Clientes() {
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20 p-40">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20 p-48">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
-          Dados do Clientes
+          Clientes
         </h1>
         <input
           type="text"
@@ -66,7 +68,7 @@ function Clientes() {
               <tr
                 key={cliente.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
-                onClick={() => window.open(`/cliente/${cliente.CPF}`)}
+                onClick={() => navigate(`/ClientePageDados/${cliente.CPF}`)}
               >
                 <td className="px-4 py-2">{cliente.CLIENTE_NOME}</td>
                 <td className="px-4 py-2">{cliente.TELEFONE}</td>

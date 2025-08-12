@@ -33,7 +33,7 @@ export default function Empresa() {
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-40">
+      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Painel de Gestão
         </h1>
@@ -71,7 +71,6 @@ export default function Empresa() {
             className="bg-white border rounded-xl p-8 shadow hover:shadow-lg cursor-pointer transition block"
           >
             <div className="flex items-center mb-4">
-              {/* Ícone de colaboradores */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8 text-blue-800 mr-3"
@@ -92,6 +91,34 @@ export default function Empresa() {
             </div>
             <p className="text-gray-600">
               Visualize e edite informações dos colaboradores.
+            </p>
+          </Link>
+          <Link
+            to="/pendencias"
+            className="bg-white border rounded-xl p-8 shadow hover:shadow-lg cursor-pointer transition block"
+          >
+            <div className="flex items-center mb-4">
+              {/* Ícone de pendências */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-blue-800 mr-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 9l4-4 4 4m0 6l-4 4-4-4"
+                />
+              </svg>
+              <h2 className="text-2xl font-semibold text-blue-800">
+                Pendências
+              </h2>
+            </div>
+            <p className="text-gray-600">
+              Acompanhe agendamentos pendentes ou não concluídos.
             </p>
           </Link>
         </div>
