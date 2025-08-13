@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../Componets/Sidebar"; 
+import Sidebar from "../Componets/Sidebar";
+import PopupConfirmacao from "../Componets/Popup";
 
 export default function Servicos() {
   const [registro, setRegistros] = useState([]);
@@ -8,6 +9,8 @@ export default function Servicos() {
   const [valor, setValor] = useState("");
   const [horarios, setHorarios] = useState("");
   const [ativo, setAtivo] = useState(1);
+  const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [msg, setMsg] = useState("");
 
   useEffect(() => {
     if (clienteSelecionado) {
@@ -48,11 +51,9 @@ export default function Servicos() {
           }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar serviço");
-      }
-
+      const data = await response.json();
+      setMostrarPopup(true);
+      setMsg(data.message);
       setClienteSelecionado(null);
     } catch (error) {
       console.error("Erro ao enviar dados:", error);
@@ -63,7 +64,7 @@ export default function Servicos() {
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-40">
+      <div className="flex-1 p-8 ms-[30vh] py-20  p-52">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">Serviços</h1>
 
         <table className="min-w-full divide-y divide-blue-100">
@@ -180,6 +181,12 @@ export default function Servicos() {
             </form>
           </div>
         </div>
+      )}
+      {mostrarPopup && (
+        <PopupConfirmacao
+          mensagem={msg}
+          onClose={() => setMostrarPopup(false)}
+        />
       )}
     </section>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../Componets/Sidebar";
+import PopupConfirmacao from "../Componets/Popup";
 
 export default function Colaboradores() {
   const [registro, setRegistros] = useState([]);
@@ -7,6 +8,8 @@ export default function Colaboradores() {
   const [nome, setNome] = useState("");
   const [cargo, setCargo] = useState("");
   const [ativo, setAtivo] = useState(1);
+  const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [msg, setMsg] = useState("");
 
   useEffect(() => {
     if (clienteSelecionado) {
@@ -19,13 +22,14 @@ export default function Colaboradores() {
         const res = await fetch(`http://localhost:5000/Colaboradores`);
         const data = await res.json();
         setRegistros(data.registros);
+        console.log(registro);
       } catch (error) {
         console.error("Erro ao buscar clientes:", error);
       }
     };
 
     fetchClientes();
-  }, [clienteSelecionado]);
+  }, [clienteSelecionado, msg, mostrarPopup]);
 
   const atualizarServico = async (e) => {
     e.preventDefault();
@@ -44,11 +48,9 @@ export default function Colaboradores() {
           }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar serviço");
-      }
-
+      const data = await response.json();
+      setMostrarPopup(true);
+      setMsg(data.message);
       setClienteSelecionado(null);
     } catch (error) {
       console.error("Erro ao enviar dados:", error);
@@ -59,8 +61,10 @@ export default function Colaboradores() {
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-40">
-        <h1 className="text-4xl font-bold text-blue-900 mb-12">Serviços</h1>
+      <div className="flex-1 p-8 ms-[30vh] py-20   p-52">
+        <h1 className="text-4xl font-bold text-blue-900 mb-12">
+          Colaboradores
+        </h1>
 
         <table className="min-w-full divide-y divide-blue-100">
           <thead className="bg-blue-50">
@@ -160,6 +164,12 @@ export default function Colaboradores() {
             </form>
           </div>
         </div>
+      )}
+      {mostrarPopup && (
+        <PopupConfirmacao
+          mensagem={msg}
+          onClose={() => setMostrarPopup(false)}
+        />
       )}
     </section>
   );

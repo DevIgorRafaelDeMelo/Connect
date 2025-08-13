@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Sidebar from "../Componets/Sidebar";
 import PopupConfirmacao from "../Componets/Popup";
+import { FaCog } from "react-icons/fa";
 
 function ClientePage() {
   const { id } = useParams();
@@ -9,6 +10,7 @@ function ClientePage() {
   const [registros, setRegistros] = useState([]);
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [msg, setMsg] = useState("");
+  const [aberto, setAberto] = useState(false);
 
   const handleConfirmar = async (id, status) => {
     try {
@@ -59,7 +61,7 @@ function ClientePage() {
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh]  py-20 p-52">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Dados do Cliente
         </h1>
@@ -78,36 +80,78 @@ function ClientePage() {
 
         <h2 className="text-2xl font-bold text-blue-800 pb-6 ">Agendado</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6 border rounded-lg p-4 shadow-sm bg-white">
-          <div key={cliente.ID} className="flex flex-col justify-center">
-            <p>
-              <strong>Serviço:</strong> {cliente.TIPO_SERVICO}
-            </p>
-            <p>
-              <strong>Data:</strong>
-              {new Date(cliente.DATA_ATENDIMENTO).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>Hora:</strong> {cliente.HORA_INICIO} - {cliente.HORA_FIM}
-            </p>
-            <p>
-              <strong>Status:</strong> {cliente.STATUS}
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+          <div
+            key={cliente.ID}
+            className="flex flex-col justify-center space-y-3"
+          >
+            <div>
+              <span className="text-sm text-gray-500">Serviço</span>
+              <p className="text-lg font-medium text-gray-800">
+                {cliente.TIPO_SERVICO}
+              </p>
+            </div>
+            <div>
+              <span className="text-sm text-gray-500">Data</span>
+              <p className="text-lg font-medium text-gray-800">
+                {new Date(cliente.DATA_ATENDIMENTO).toLocaleDateString()}
+              </p>
+            </div>
+            <div>
+              <span className="text-sm text-gray-500">Horário</span>
+              <p className="text-lg font-medium text-gray-800">
+                {cliente.HORA_INICIO} - {cliente.HORA_FIM}
+              </p>
+            </div>
+            <div>
+              <span className="text-sm text-gray-500">Status</span>
+              <p
+                className={`text-lg font-semibold ${
+                  cliente.STATUS === "REALIZADO"
+                    ? "text-green-600"
+                    : cliente.STATUS === "CANCELADO"
+                    ? "text-red-500"
+                    : "text-yellow-600"
+                }`}
+              >
+                {cliente.STATUS}
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center justify-center md:justify-end gap-4 pe-20">
-            <button
-              onClick={() => handleConfirmar(cliente.ID, "REALIZADO")}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow-sm transition"
-            >
-              Confirmar
-            </button>
-            <button
-              onClick={() => handleConfirmar(cliente.ID, "CANCELADO")}
-              className="bg-gray-400 hover:bg-gray-500 text-white font-semibold px-6 py-2 rounded shadow-sm transition"
-            >
-              Cancelar
-            </button>
+          <div className="flex items-start justify-end">
+            <div className="relative inline-block text-left">
+              <button
+                onClick={() => setAberto(!aberto)}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-md shadow transition flex items-center gap-2"
+              >
+                <FaCog className="text-white text-lg" />
+                Ações
+              </button>
+
+              {aberto && (
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  <button
+                    onClick={() => {
+                      handleConfirmar(cliente.ID, "REALIZADO");
+                      setAberto(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-blue-50 text-blue-700"
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleConfirmar(cliente.ID, "CANCELADO");
+                      setAberto(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -154,7 +198,7 @@ function ClientePage() {
                         ? "text-green-600"
                         : registro.STATUS === "Cancelado"
                         ? "text-red-600"
-                        : "text-yellow-600"
+                        : "text-blue-600"
                     }`}
                   >
                     {registro.STATUS}

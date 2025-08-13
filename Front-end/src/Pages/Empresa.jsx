@@ -31,9 +31,9 @@ export default function Empresa() {
   }, []);
 
   return (
-    <section className="flex h-screen">
+    <section className="flex   h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 ms-[30vh] py-20  p-52 ">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Painel de Gestão
         </h1>

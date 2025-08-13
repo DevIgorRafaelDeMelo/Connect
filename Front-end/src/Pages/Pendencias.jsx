@@ -55,7 +55,7 @@ export default function Empresa() {
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 ms-[30vh] py-20  p-52 ">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Agendamentos pendentes
         </h1>
@@ -123,7 +123,7 @@ export default function Empresa() {
                           }
                           className="bg-gray-400 hover:bg-gray-500 text-white font-semibold px-4 py-1 rounded shadow-sm transition"
                         >
-                          Cancelar
+                          Cancelado
                         </button>
                       </div>
                     </td>

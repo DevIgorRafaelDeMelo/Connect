@@ -1,11 +1,26 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Sidebar from "../Componets/Sidebar";
+import {
+  FaGem,
+  FaStarHalfAlt,
+  FaMedal,
+  FaCircle,
+  FaCrown,
+} from "react-icons/fa";
 
 function ClientePageDados() {
   const { cpf } = useParams();
   const [cliente, setCliente] = useState(null);
   const [registros, setRegistros] = useState([]);
+
+  const nivelEstilo = {
+    1: { color: "text-gray-500", label: "Prata", icon: FaCircle },
+    2: { color: "text-yellow-600", label: "Ouro", icon: FaStarHalfAlt },
+    3: { color: "text-purple-500", label: "VIP", icon: FaMedal },
+    4: { color: "text-blue-500", label: "Platina", icon: FaGem },
+    5: { color: "text-cyan-500", label: "Diamante", icon: FaCrown },
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -31,29 +46,59 @@ function ClientePageDados() {
     };
   }, [cpf]);
 
+  const realizados = registros.filter((item) => item.STATUS === "REALIZADO");
+  const totalRealizados = realizados.length;
+
+  const getNivel = (total) => {
+    if (total >= 100) return 5;
+    if (total >= 50) return 4;
+    if (total >= 30) return 3;
+    if (total >= 10) return 2;
+    return 1;
+  };
+
+  const nivel = getNivel(totalRealizados);
+  const estilo = nivelEstilo[nivel];
+  const Icon = estilo.icon;
+
   if (!cliente) return <p>Carregando...</p>;
 
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20  p-52">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Dados do Cliente
         </h1>
 
-        <div className="  mb-10">
-          <div>
-            <strong>Nome:</strong> {cliente.CLIENTE_NOME}
+        <div className="mb-10 bg-white p-6 rounded-xl shadow-lg flex flex-col md:flex-row justify-between items-start gap-6">
+          {/* Dados do cliente */}
+          <div className="flex flex-col gap-2">
+            <div>
+              <strong>Nome:</strong> {cliente.CLIENTE_NOME}
+            </div>
+            <div>
+              <strong>CPF:</strong> {cliente.CPF}
+            </div>
+            <div>
+              <strong>Telefone:</strong> {cliente.TELEFONE}
+            </div>
           </div>
-          <div>
-            <strong>CPF:</strong> {cliente.CPF}
-          </div>
-          <div>
-            <strong>Telefone:</strong> {cliente.TELEFONE}
+
+          {/* Nível do cliente */}
+          <div
+            className={`flex justify-between items-center gap-4 ${estilo.color}`}
+          >
+            <div>
+              <p className="text-sm font-semibold">Nível atual</p>
+              <p className="text-lg font-bold">{estilo.label}</p>
+              <p className="text-xs text-gray-400">
+                Total realizados: {totalRealizados}
+              </p>
+            </div>
+            <Icon className="text-3xl" />
           </div>
         </div>
-
-         
 
         <h2 className="text-2xl font-bold text-blue-800 pb-6">
           Histórico de Agendamentos
@@ -98,7 +143,7 @@ function ClientePageDados() {
                         ? "text-green-600"
                         : registro.STATUS === "Cancelado"
                         ? "text-red-600"
-                        : "text-yellow-600"
+                        : "text-blue-600"
                     }`}
                   >
                     {registro.STATUS}
