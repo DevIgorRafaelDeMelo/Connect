@@ -1,28 +1,36 @@
 import React, { useState } from "react";
 import "react-calendar/dist/Calendar.css";
 import { getMonthDays } from "../utils/getMonthDays";
-import CalendarCard from "./Componets/CalendarCard";
-import { FaCalendarAlt, FaArrowCircleRight } from "react-icons/fa";
+import CalendarCardClient from "./Componets/CalendarCardClient";
 
 function Home() {
   const [resposta, setResposta] = useState("");
   const [carregando, setCarregando] = useState(false);
-  const [showAgenda, setShowAgenda] = useState(false);
-  const [agenda, setAgenda] = useState([]);
-
-  const [selectedMonth, setSelectedMonth] = useState("current");
-
+  const [showAgenda, setShowAgenda] = useState(false); 
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
-
-  const nextMonth = (currentMonth + 1) % 12;
-  const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
-
-  const currentMonthName = now.toLocaleString("pt-BR", { month: "long" });
-  const nextMonthName = new Date(nextYear, nextMonth).toLocaleString("pt-BR", {
-    month: "long",
+  const [selectedMonth, setSelectedMonth] = useState({
+    month: currentMonth,
+    year: currentYear,
   });
+
+  const getNext12Months = () => {
+    const months = [];
+    const now = new Date();
+
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const monthName = date.toLocaleString("default", { month: "long" });
+      months.push({
+        label: `${monthName} ${date.getFullYear()}`,
+        month: date.getMonth(),
+        year: date.getFullYear(),
+      });
+    }
+
+    return months;
+  };
 
   const HandleCallAgenda = async () => {
     setCarregando(true);
@@ -36,12 +44,9 @@ function Home() {
         body: JSON.stringify({ ID: 1 }),
       });
 
-      if (!response.ok) throw new Error("Erro ao conectar");
-
       const data = await response.json();
 
       setShowAgenda(true);
-      setAgenda(data.AGENDA);
       setResposta(data.mensagem || "Mensagem enviada com sucesso!");
     } catch (error) {
       console.error("Erro:", error);
@@ -83,50 +88,52 @@ function Home() {
             <p className="text-2xl font-bold text-gray-800 mb-6 text-center w-full">
               📆 Agenda
             </p>
-            <div className="flex gap-4 mb-4">
-              <button
-                onClick={() => setSelectedMonth("current")}
-                className={`px-4 py-2 flex items-center gap-2 rounded ${
-                  selectedMonth === "current"
-                    ? "bg-blue-700 text-white"
-                    : "bg-blue-200 text-blue-800"
-                }`}
-              >
-                <FaCalendarAlt />
-                Mês Atual
-              </button>
-
-              <button
-                onClick={() => setSelectedMonth("next")}
-                className={`px-4 py-2 flex items-center gap-2 rounded ${
-                  selectedMonth === "next"
-                    ? "bg-green-700 text-white"
-                    : "bg-green-200 text-green-800"
-                }`}
-              >
-                <FaArrowCircleRight />
-                Próximo Mês
-              </button>
+            <div className="flex justify-center pb-10">
+              <div className="relative w-full max-w-xs">
+                <svg
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-500 pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 10h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <select
+                  onChange={(e) => {
+                    const [month, year] = e.target.value.split("-");
+                    setSelectedMonth({
+                      month: parseInt(month),
+                      year: parseInt(year),
+                    });
+                  }}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white border border-blue-300 text-blue-900 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                >
+                  {getNext12Months().map(({ label, month, year }) => (
+                    <option key={`${month}-${year}`} value={`${month}-${year}`}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-
-            <div className="flex flex-wrap justify-center">
-              {selectedMonth === "current" && (
-                <CalendarCard
-                  monthName={currentMonthName}
-                  month={currentMonth}
-                  year={currentYear}
-                  days={getMonthDays(currentMonth, currentYear)}
-                  agenda={agenda}
+            <div className="  flex flex-col items-center  ">
+              <div className="w-[100vh] ">
+                <CalendarCardClient
+                  monthName={new Date(
+                    selectedMonth.year,
+                    selectedMonth.month
+                  ).toLocaleString("default", { month: "long" })}
+                  month={selectedMonth.month}
+                  year={selectedMonth.year}
+                  days={getMonthDays(selectedMonth.month, selectedMonth.year)}
+                  admin={true}
                 />
-              )}
-              {selectedMonth === "next" && (
-                <CalendarCard
-                  month={nextMonthName}
-                  year={nextYear}
-                  days={getMonthDays(nextMonth, nextYear)}
-                  agenda={agenda}
-                />
-              )}
+              </div>
             </div>
           </div>
         )}

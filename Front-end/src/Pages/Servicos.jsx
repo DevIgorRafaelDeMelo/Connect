@@ -11,6 +11,8 @@ export default function Servicos() {
   const [ativo, setAtivo] = useState(1);
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [msg, setMsg] = useState("");
+  const [showFormulario, setShowFormulario] = useState(false);
+  const [descricao, setDescricao] = useState();
 
   useEffect(() => {
     if (clienteSelecionado) {
@@ -31,7 +33,7 @@ export default function Servicos() {
     };
 
     fetchClientes();
-  }, [clienteSelecionado]);
+  }, [clienteSelecionado, msg, mostrarPopup]);
 
   const atualizarServico = async (e) => {
     e.preventDefault();
@@ -61,12 +63,59 @@ export default function Servicos() {
     }
   };
 
+  const handleCadastro = async (e) => {
+    e.preventDefault();
+
+    const novoServico = {
+      descricao,
+      valor,
+      horarios,
+      ativo,
+    };
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/CadastroServico`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(novoServico),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao cadastrar serviço");
+      }
+
+      const resultado = await response.json();
+      console.log("Serviço cadastrado com sucesso:", resultado);
+
+      setDescricao("");
+      setValor("");
+      setHorarios("");
+      setAtivo("1");
+      setShowFormulario(false);
+    } catch (error) {
+      console.error("Erro:", error);
+      alert("Não foi possível cadastrar o serviço.");
+    }
+  };
+
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20  p-52">
+      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">Serviços</h1>
-
+        <div className="flex justify-end mb-8">
+          <button
+            onClick={() => setShowFormulario(!showFormulario)}
+            className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-full shadow hover:bg-blue-700 transition duration-300"
+          >
+            Cadastrar Serviço
+          </button>
+        </div>
         <table className="min-w-full divide-y divide-blue-100">
           <thead className="bg-blue-50">
             <tr>
@@ -108,6 +157,7 @@ export default function Servicos() {
           </tbody>
         </table>
       </div>
+
       {clienteSelecionado && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 w-[400px] relative">
@@ -178,6 +228,80 @@ export default function Servicos() {
               >
                 Salvar
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+      {showFormulario && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl p-8">
+            <h2 className="text-xl font-bold text-blue-800 mb-6">
+              Cadastrar Serviço
+            </h2>
+            <form onSubmit={handleCadastro}>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-blue-700 mb-1">
+                    Descrição
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={descricao}
+                    onChange={(e) => setDescricao(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-blue-700 mb-1">
+                    Valor
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={valor}
+                    onChange={(e) => setValor(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-blue-700 mb-1">
+                    Horários
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={horarios}
+                    onChange={(e) => setHorarios(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-blue-700 mb-1">
+                    Status
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={ativo}
+                    onChange={(e) => setAtivo(e.target.value)}
+                  >
+                    <option value="1">Ativo</option>
+                    <option value="0">Inativo</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-4 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowFormulario(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300"
+                >
+                  Salvar
+                </button>
+              </div>
             </form>
           </div>
         </div>

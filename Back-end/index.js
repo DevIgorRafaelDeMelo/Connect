@@ -20,7 +20,8 @@ const ServicosId = require("./seguimento/ServicosId");
 const Colaboradores = require("./seguimento/Colaboradores");
 const ColaboradorId = require("./seguimento/ColaboradorId");
 const AtualizaStatus = require("./seguimento/AtualizaStatus");
-const Pendencias = require("./seguimento/Pendencias")
+const Pendencias = require("./seguimento/Pendencias");
+const CadastroServico = require("./seguimento/CadastroServico");
 
 app.post("/agenda", agenda);
 app.post("/comfirmagendamento", comfirmagendamento);
@@ -34,7 +35,8 @@ app.use("/servicosId", ServicosId);
 app.use("/Colaboradores", Colaboradores);
 app.use("/ColaboradorId", ColaboradorId);
 app.use("/AtualizaStatus", AtualizaStatus);
-app.use("/Pendencias", Pendencias)
+app.use("/Pendencias", Pendencias);
+app.use("/CadastroServico", CadastroServico);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

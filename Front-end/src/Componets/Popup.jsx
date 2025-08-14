@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 
-const PopupNotificacao = ({ mensagem, onClose }) => {
+const PopupConfirmacao = ({ mensagem, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 1000);  
+    }, 1000); // 1 segundo
 
     return () => clearTimeout(timer);
   }, [onClose]);
@@ -31,4 +31,4 @@ const PopupNotificacao = ({ mensagem, onClose }) => {
   );
 };
 
-export default PopupNotificacao;
+export default PopupConfirmacao;

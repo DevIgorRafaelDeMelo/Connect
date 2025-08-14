@@ -12,6 +12,8 @@ import Servicos from "./Pages/Servicos";
 import Colaboradores from "./Pages/Colaboradores";
 import ClientePageDados from "./Pages/ClienteDados";
 import Pendencias from "./Pages/Pendencias";
+import Agendar from "./Pages/Agendar";
+import Administracao from "./Pages/Administracao";
 
 function App() {
   return (
@@ -96,6 +98,22 @@ function App() {
         element={
           <RotaProtegida>
             <Pendencias />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/Agendar"
+        element={
+          <RotaProtegida>
+            <Agendar />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/administracao"
+        element={
+          <RotaProtegida>
+            <Administracao />
           </RotaProtegida>
         }
       />

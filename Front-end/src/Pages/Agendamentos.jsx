@@ -115,7 +115,7 @@ function Agendamentos() {
   return (
     <section className="flex h-screen  ">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20   p-52">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20 p-48">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
           Lista de Agendamentos
         </h1>
@@ -163,11 +163,9 @@ function Agendamentos() {
               <option value="CANCELADO">Cancelado</option>
             </select>
           </div>
-
-          {/* Campos colapsáveis */}
+ 
           {mostrarMais && (
-            <>
-              {/* Campo 3: Tipo de Serviço */}
+            <> 
               <div className="flex flex-col">
                 <label className="mb-1 text-sm font-semibold text-gray-700">
                   Tipo de serviço
@@ -217,8 +215,7 @@ function Agendamentos() {
               </div>
             </>
           )}
-
-          {/* Botão de colapso */}
+ 
           <div className="col-span-full flex justify-end mt-2">
             <button
               type="button"

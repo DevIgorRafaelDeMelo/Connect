@@ -21,8 +21,7 @@ export default function Colaboradores() {
       try {
         const res = await fetch(`http://localhost:5000/Colaboradores`);
         const data = await res.json();
-        setRegistros(data.registros);
-        console.log(registro);
+        setRegistros(data.registros); 
       } catch (error) {
         console.error("Erro ao buscar clientes:", error);
       }
@@ -61,7 +60,7 @@ export default function Colaboradores() {
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20   p-52">
+      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Colaboradores
         </h1>

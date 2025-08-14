@@ -1,17 +1,20 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import Logo from "../assets/freepik__a-minimalist-icon-for-an-erp-company-depicting-int__4309-removebg-preview (1).png";
 
 function Sidebar() {
   return (
     <aside className="w-[30vh] bg-gradient-to-b from-blue-900 to-blue-700 text-white p-6 shadow-lg fixed top-0 h-full">
-      <h1 className="text-3xl font-extrabold mb-10 text-center tracking-wide">
-        Painel Admin
-      </h1>
+      <img src={Logo} alt="Descrição da imagem" className="h-36 m-auto" />
 
       <nav className="space-y-3">
-        <Link
+        <NavLink
           to="/Dashbord"
-          className="flex items-center px-4 py-2 rounded-lg bg-blue-800 hover:bg-blue-600 transition duration-200"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-2 rounded-lg transition duration-200 ${
+              isActive ? "bg-blue-800" : "hover:bg-blue-600"
+            }`
+          }
         >
           <svg
             className="w-5 h-5 mr-3 text-blue-300"
@@ -27,10 +30,14 @@ function Sidebar() {
             />
           </svg>
           <span className="font-medium">Dashboard</span>
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           to="/Agendamentos"
-          className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-2 rounded-lg transition duration-200 ${
+              isActive ? "bg-blue-800" : "hover:bg-blue-600"
+            }`
+          }
         >
           <svg
             className="w-5 h-5 mr-3 text-blue-300"
@@ -46,11 +53,38 @@ function Sidebar() {
             />
           </svg>
           <span className="font-medium">Agendamentos</span>
-        </Link>
+        </NavLink>
+        <NavLink
+          to="/Agendar"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-2 rounded-lg transition duration-200 ${
+              isActive ? "bg-blue-800" : "hover:bg-blue-600"
+            }`
+          }
+        >
+          <svg
+            className="w-5 h-5 mr-3 text-blue-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          <span className="font-medium">Agendar</span>
+        </NavLink>
 
-        <Link
+        <NavLink
           to="/Clientes"
-          className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-2 rounded-lg transition duration-200 ${
+              isActive ? "bg-blue-800" : "hover:bg-blue-600"
+            }`
+          }
         >
           <svg
             className="w-5 h-5 mr-3 text-blue-300"
@@ -66,11 +100,15 @@ function Sidebar() {
             />
           </svg>
           <span className="font-medium">Clientes</span>
-        </Link>
+        </NavLink>
 
-        <Link
+        <NavLink
           to="/Empresa"
-          className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-2 rounded-lg transition duration-200 ${
+              isActive ? "bg-blue-800" : "hover:bg-blue-600"
+            }`
+          }
         >
           <svg
             className="w-5 h-5 mr-3 text-blue-300"
@@ -85,28 +123,8 @@ function Sidebar() {
               d="M7 8h10M7 12h10M7 16h10"
             />
           </svg>
-          <span className="font-medium">Empresas</span>
-        </Link>
-
-        <Link
-          to="#"
-          className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
-        >
-          <svg
-            className="w-5 h-5 mr-3 text-blue-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M19.5 12a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z"
-            />
-          </svg>
-          <span className="font-medium">Configurações</span>
-        </Link>
+          <span className="font-medium">Empresa</span>
+        </NavLink>
       </nav>
     </aside>
   );

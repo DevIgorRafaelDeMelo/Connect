@@ -61,7 +61,7 @@ function ClientePage() {
   return (
     <section className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh]  py-20 p-52">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh]  py-20 p-44">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Dados do Cliente
         </h1>

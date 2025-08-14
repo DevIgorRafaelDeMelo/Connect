@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
 import PopupConfirmacao from "../Componets/Popup";
 
 const CalendarCard = ({ month, year, days }) => {
@@ -9,8 +8,8 @@ const CalendarCard = ({ month, year, days }) => {
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [msg, setMsg] = useState("");
   const [agenda, setAgenda] = useState();
-  const [servico, setServico] = useState();
-
+  const [servicos, setServicos] = useState([]);
+  const [numero, setNumero] = useState();
   const [formData, setFormData] = useState({
     nome: "",
     telefone: "",
@@ -18,6 +17,44 @@ const CalendarCard = ({ month, year, days }) => {
     tipoServico: "",
   });
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const confirmarEEnviarWhatsApp = ({
+    formData,
+    selectedTime,
+    selectedDay,
+  }) => {
+    submitAgendamento({
+      formData,
+      selectedTime,
+      selectedDay,
+      onSuccess: () => {
+        setMsg("Agendamento confirmado!");
+        setShowConfirmModal(false);
+        setShowFormModal(false);
+        setSelectedDay(null);
+
+        const mensagem = `
+        *Protocolo de Agendamento* 📋
+
+        • Nome: ${formData.nome}
+        • Telefone: ${formData.telefone}
+        • CPF: ${formData.cpf}
+        • Serviço: ${formData.tipoServico}
+        • Horário: ${selectedTime?.slice(0, 5)}
+        • Data: ${selectedDay.day}/${selectedDay.month + 1}/${selectedDay.year}
+      `;
+
+        const numeroWhatsApp = numero;
+        const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(
+          mensagem
+        )}`;
+
+        window.open(url, "_blank");
+      },
+      onError: () => {
+        setMsg("Erro ao confirmar agendamento.");
+      },
+    });
+  };
 
   useEffect(() => {
     const fetchAgenda = async () => {
@@ -33,7 +70,8 @@ const CalendarCard = ({ month, year, days }) => {
         const data = await response.json();
 
         setAgenda(data.AGENDA);
-        setServico(data.SERVICO);
+        setServicos(data.SERVICO);
+        setNumero(data.NUMERO);
       } catch (error) {
         console.error("Erro ao atualizar status:", error);
         setMsg("Erro ao atualizar serviço");
@@ -121,8 +159,7 @@ const CalendarCard = ({ month, year, days }) => {
 
       {selectedDay && (
         <div className="fixed inset-0 z-50 flex h-screen">
-          <Sidebar />{" "}
-          <div className="flex-1 p-8 ms-[30vh] py-20 px-48 overflow-y-auto bg-white">
+          <div className="flex-1 p-8  py-20 px-48 overflow-y-auto bg-white">
             <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3  ">
               Horários disponíveis
             </h1>
@@ -210,10 +247,10 @@ const CalendarCard = ({ month, year, days }) => {
       )}
       {showFormModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md border border-blue-200 relative m-4  ">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md border border-blue-200 relative m-4 transition-transform scale-[1] hover:scale-[1.01]">
             <button
               onClick={() => setShowFormModal(false)}
-              className="absolute top-3 right-3 text-black-500 hover:text-black-700 text-xl font-bold"
+              className="absolute top-3 right-3 text-red-500 hover:text-red-700 text-xl font-bold"
               title="Fechar"
             >
               ✕
@@ -288,7 +325,7 @@ const CalendarCard = ({ month, year, days }) => {
                   required
                 >
                   <option value="">Selecione...</option>
-                  {servico.map((servico) => (
+                  {servicos.map((servico) => (
                     <option key={servico.ID} value={servico.NOME}>
                       {servico.NOME}
                     </option>
@@ -308,7 +345,7 @@ const CalendarCard = ({ month, year, days }) => {
       )}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative m-4 border border-blue-200 transition-transform  ">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative m-4 border border-blue-200 transition-transform scale-[1] hover:scale-[1.01]">
             <h3 className="text-2xl font-semibold text-center text-blue-900 mb-6">
               Confirmar Agendamento
             </h3>
@@ -352,6 +389,11 @@ const CalendarCard = ({ month, year, days }) => {
                     onError: () => {
                       setMsg("Erro ao confirmar agendamento.");
                     },
+                  });
+                  confirmarEEnviarWhatsApp({
+                    formData,
+                    selectedTime,
+                    selectedDay,
                   });
                 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
