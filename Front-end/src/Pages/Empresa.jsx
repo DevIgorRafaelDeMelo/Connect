@@ -15,17 +15,12 @@ export default function Empresa() {
             "Content-Type": "application/json",
           },
           signal: controller.signal,
+          body: JSON.stringify({ ID: 1 }),
         });
       } catch (error) {
         console.error("Erro ao buscar empresas:", error);
       }
     };
-
-    fetchEmpresas();
-  }, []);
-
-  useEffect(() => {
-    const fetchEmpresas = async () => {};
 
     fetchEmpresas();
   }, []);
@@ -44,7 +39,6 @@ export default function Empresa() {
             className="bg-white border rounded-xl p-8 shadow hover:shadow-lg cursor-pointer transition block"
           >
             <div className="flex items-center mb-4">
-              {/* Ícone de serviços */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8 text-blue-800 mr-3"
@@ -98,7 +92,6 @@ export default function Empresa() {
             className="bg-white border rounded-xl p-8 shadow hover:shadow-lg cursor-pointer transition block"
           >
             <div className="flex items-center mb-4">
-              {/* Ícone de pendências */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8 text-blue-800 mr-3"
@@ -126,7 +119,6 @@ export default function Empresa() {
             className="bg-white border rounded-xl p-8 shadow hover:shadow-lg cursor-pointer transition block"
           >
             <div className="flex items-center mb-4">
-              {/* Ícone de administração */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-8 w-8 text-blue-800 mr-3"

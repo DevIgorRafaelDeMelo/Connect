@@ -6,18 +6,15 @@ const agenda = async (req, res) => {
     const [results] = await db.query(
       "SELECT DATA_ATENDIMENTO, HORA_INICIO, HORA_FIM FROM AGENDA WHERE EMPRESA_ID = ? ORDER BY DATA_ATENDIMENTO, HORA_INICIO",
       [empresaId]
-    );
-    console.log(results);
+    ); 
     const [servico] = await db.query(
       "SELECT * FROM tipos_servico WHERE EMPRESA_ID = ?  ",
       [empresaId]
-    );
-    console.log(servico);
+    ); 
     const [numero] = await db.query(
       "SELECT NUMERO FROM empresa WHERE ID = ?  ",
       [empresaId]
     );
-    console.log(numero);
     res.json({ AGENDA: results, SERVICO: servico, NUMERO: numero });
   } catch (err) {
     console.error("Erro ao consultar a agenda:", err);
