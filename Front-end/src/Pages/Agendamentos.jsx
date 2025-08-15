@@ -31,6 +31,8 @@ function Agendamentos() {
   const [filtroTipoServico, setFiltroTipoServico] = useState("");
   const [filtroCPF, setFiltroCPF] = useState("");
   const [mostrarMais, setMostrarMais] = useState(false);
+  const [ordenarPor, setOrdenarPor] = useState(null);
+  const [ordemAscendente, setOrdemAscendente] = useState(true);
 
   const dataInicio = filtroDataInicio
     ? new Date(`${filtroDataInicio}T00:00:00`)
@@ -69,6 +71,39 @@ function Agendamentos() {
       horaValida &&
       tipoValido
     );
+  });
+
+  const ordenarAgendamentos = (coluna) => {
+    if (ordenarPor === coluna) {
+      setOrdemAscendente(!ordemAscendente);
+    } else {
+      setOrdenarPor(coluna);
+      setOrdemAscendente(true);
+    }
+  };
+
+  const agendamentosOrdenados = [...agendamentosFiltrados].sort((a, b) => {
+    if (!ordenarPor) return 0;
+
+    let valorA = a[ordenarPor];
+    let valorB = b[ordenarPor];
+ 
+    valorA = valorA ?? "";
+    valorB = valorB ?? "";
+ 
+    if (ordenarPor === "DATA_ATENDIMENTO") {
+      return ordemAscendente
+        ? new Date(valorA) - new Date(valorB)
+        : new Date(valorB) - new Date(valorA);
+    }
+ 
+    if (typeof valorA === "string" && typeof valorB === "string") {
+      return ordemAscendente
+        ? valorA.localeCompare(valorB)
+        : valorB.localeCompare(valorA);
+    }
+ 
+    return ordemAscendente ? valorA - valorB : valorB - valorA;
   });
 
   useEffect(() => {
@@ -120,7 +155,6 @@ function Agendamentos() {
           Lista de Agendamentos
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          {/* Campo 1: Nome */}
           <div className="flex flex-col">
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Nome do cliente
@@ -134,7 +168,6 @@ function Agendamentos() {
             />
           </div>
 
-          {/* Campo 2: CPF */}
           <div className="flex flex-col">
             <label className="mb-1 text-sm font-semibold text-gray-700">
               CPF
@@ -163,9 +196,9 @@ function Agendamentos() {
               <option value="CANCELADO">Cancelado</option>
             </select>
           </div>
- 
+
           {mostrarMais && (
-            <> 
+            <>
               <div className="flex flex-col">
                 <label className="mb-1 text-sm font-semibold text-gray-700">
                   Tipo de serviço
@@ -215,7 +248,7 @@ function Agendamentos() {
               </div>
             </>
           )}
- 
+
           <div className="col-span-full flex justify-end mt-2">
             <button
               type="button"
@@ -229,28 +262,36 @@ function Agendamentos() {
         <table className="min-w-full divide-y divide-blue-100  ">
           <thead className="bg-blue-50">
             <tr>
-              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
-                Cliente
-              </th>
-              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
-                CPF
-              </th>
-              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
-                Serviço
-              </th>
-              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
-                Data
-              </th>
-              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
-                Hora
-              </th>
-              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
-                Status
-              </th>
+              {[
+                { label: "Cliente", key: "CLIENTE_NOME" },
+                { label: "CPF", key: "CPF" },
+                { label: "Serviço", key: "TIPO_SERVICO" },
+                { label: "Data", key: "DATA_ATENDIMENTO" },
+                { label: "Hora", key: "HORA_INICIO" },
+                { label: "Status", key: "STATUS" },
+              ].map(({ label, key }) => {
+                const isActive = ordenarPor === key;
+                const icon = isActive ? (ordemAscendente ? "🔼" : "🔽") : "⬍";
+
+                return (
+                  <th
+                    key={key}
+                    onClick={() => ordenarAgendamentos(key)}
+                    className={`px-4 py-2 text-left font-semibold text-sm text-blue-700 cursor-pointer select-none ${
+                      isActive ? "bg-blue-100" : ""
+                    }`}
+                  >
+                    <div className="flex justify-between items-center w-full">
+                      <span>{label}</span>
+                      <span className="pl-2">{icon}</span>
+                    </div>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {agendamentosFiltrados.map((a) => (
+            {agendamentosOrdenados.map((a) => (
               <tr
                 key={a.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"

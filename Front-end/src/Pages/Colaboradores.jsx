@@ -21,7 +21,7 @@ export default function Colaboradores() {
       try {
         const res = await fetch(`http://localhost:5000/Colaboradores`);
         const data = await res.json();
-        setRegistros(data.registros); 
+        setRegistros(data.registros);
       } catch (error) {
         console.error("Erro ao buscar clientes:", error);
       }
@@ -44,6 +44,7 @@ export default function Colaboradores() {
             NOME: nome,
             CARGO: cargo,
             ATIVO: ativo,
+            EXPEDIENTE: expediente,
           }),
         }
       );
@@ -55,6 +56,39 @@ export default function Colaboradores() {
       console.error("Erro ao enviar dados:", error);
       alert("Erro ao atualizar serviço");
     }
+  };
+
+  const diasSemana = [
+    { nome: "Segunda", key: "segunda" },
+    { nome: "Terça", key: "terca" },
+    { nome: "Quarta", key: "quarta" },
+    { nome: "Quinta", key: "quinta" },
+    { nome: "Sexta", key: "sexta" },
+    { nome: "Sábado", key: "sabado" },
+    { nome: "Domingo", key: "domingo" },
+  ];
+
+  const [expediente, setExpediente] = useState(
+    diasSemana.reduce((acc, dia) => {
+      acc[dia.key] = {
+        ativo: false,
+        inicio: "",
+        pausaInicio: "",
+        pausaFim: "",
+        fim: "",
+      };
+      return acc;
+    }, {})
+  );
+
+  const atualizarDia = (key, campo, valor) => {
+    setExpediente((prev) => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        [campo]: campo === "ativo" ? valor : valor,
+      },
+    }));
   };
 
   return (
@@ -104,7 +138,7 @@ export default function Colaboradores() {
       </div>
       {clienteSelecionado && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-[400px] relative">
+          <div className="bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-3xl mx-4 sm:mx-0 relative overflow-y-auto max-h-[90vh]">
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-red-500"
               onClick={() => setClienteSelecionado(null)}
@@ -152,6 +186,83 @@ export default function Colaboradores() {
                   <option value={1}>Ativo</option>
                   <option value={0}>Inativo</option>
                 </select>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-blue-700 mb-2">
+                  Expediente
+                </h3>
+                {diasSemana.map(({ nome, key }) => (
+                  <div key={key} className="mb-4 border-b pb-2">
+                    <label className="flex items-center gap-2 mb-2">
+                      <input
+                        type="checkbox"
+                        checked={expediente[key].ativo}
+                        onChange={(e) =>
+                          atualizarDia(key, "ativo", e.target.checked)
+                        }
+                      />
+                      <span className="font-medium text-gray-700">{nome}</span>
+                    </label>
+
+                    {expediente[key].ativo && (
+                      <div className="grid grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-sm text-gray-600">
+                            Início
+                          </label>
+                          <input
+                            type="time"
+                            value={expediente[key].inicio}
+                            onChange={(e) =>
+                              atualizarDia(key, "inicio", e.target.value)
+                            }
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600">
+                            Início da Pausa
+                          </label>
+                          <input
+                            type="time"
+                            value={expediente[key].pausaInicio}
+                            onChange={(e) =>
+                              atualizarDia(key, "pausaInicio", e.target.value)
+                            }
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600">
+                            Fim da Pausa
+                          </label>
+                          <input
+                            type="time"
+                            value={expediente[key].pausaFim}
+                            onChange={(e) =>
+                              atualizarDia(key, "pausaFim", e.target.value)
+                            }
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600">
+                            Fim
+                          </label>
+                          <input
+                            type="time"
+                            value={expediente[key].fim}
+                            onChange={(e) =>
+                              atualizarDia(key, "fim", e.target.value)
+                            }
+                            className="w-full border border-gray-300 rounded-md px-3 py-2"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
 
               <button
