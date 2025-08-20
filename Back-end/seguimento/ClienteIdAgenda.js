@@ -2,14 +2,15 @@ const express = require("express");
 const router = express.Router();
 const { getClientByID, getClientsByCPF } = require("../server/Service");
 
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-
+router.get("/:id/:idA", async (req, res) => {
+  const { id, idA } = req.params; 
   try {
+    const atendimento = await getClientByID(idA);
     const registros = await getClientsByCPF(id);
 
-    if (registros) {
+    if (atendimento) {
       res.json({
+        atendimento,
         registros,
       });
     } else {

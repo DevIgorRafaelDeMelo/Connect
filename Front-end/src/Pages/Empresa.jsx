@@ -5,20 +5,31 @@ import { Link } from "react-router-dom";
 export default function Empresa() {
   useEffect(() => {
     const fetchEmpresas = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token não encontrado.");
+        return;
+      }
+
       try {
-        const controller = new AbortController();
-        const token = localStorage.getItem("token");
-        await fetch("http://localhost:5000/Empresa", {
+        const res = await fetch("http://localhost:5000/Empresa", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          signal: controller.signal,
           body: JSON.stringify({ ID: 1 }),
         });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.erro || "Erro na requisição");
+        }
+
+        const data = await res.json();
+        console.log("Dados da empresa:", data);
       } catch (error) {
-        console.error("Erro ao buscar empresas:", error);
+        console.error("Erro ao buscar empresas:", error.message);
       }
     };
 
@@ -26,9 +37,9 @@ export default function Empresa() {
   }, []);
 
   return (
-    <section className="flex   h-screen">
+    <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Painel de Gestão
         </h1>

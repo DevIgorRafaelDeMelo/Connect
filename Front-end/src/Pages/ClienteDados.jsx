@@ -8,8 +8,10 @@ import {
   FaCircle,
   FaCrown,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function ClientePageDados() {
+  const navigate = useNavigate();
   const { cpf } = useParams();
   const [cliente, setCliente] = useState(null);
   const [registros, setRegistros] = useState([]);
@@ -24,12 +26,21 @@ function ClientePageDados() {
 
   useEffect(() => {
     let isMounted = true;
-
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
     const fetchCliente = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/clientes/${cpf}`);
+        const res = await fetch(`http://localhost:5000/clientes/${cpf}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         const data = await res.json();
-        console.log(data);
+
         if (isMounted) {
           setCliente(data.atendimento);
           setRegistros(data.registros);
@@ -64,15 +75,14 @@ function ClientePageDados() {
   if (!cliente) return <p>Carregando...</p>;
 
   return (
-    <section className="flex h-screen">
+    <section className="flex  ">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20  p-48">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Dados do Cliente
         </h1>
 
         <div className="mb-10 bg-white p-6 rounded-xl shadow-lg flex flex-col md:flex-row justify-between items-start gap-6">
-          {/* Dados do cliente */}
           <div className="flex flex-col gap-2">
             <div>
               <strong>Nome:</strong> {cliente.CLIENTE_NOME}
@@ -84,8 +94,6 @@ function ClientePageDados() {
               <strong>Telefone:</strong> {cliente.TELEFONE}
             </div>
           </div>
-
-          {/* Nível do cliente */}
           <div
             className={`flex justify-between items-center gap-4 ${estilo.color}`}
           >
@@ -126,6 +134,9 @@ function ClientePageDados() {
               <tr
                 key={registro.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
+                onClick={() =>
+                  navigate(`/clienteIdAgenda/${registro.CPF}/${registro.ID}`)
+                }
               >
                 <td className="px-4 py-2">{registro.TIPO_SERVICO}</td>
                 <td className="px-4 py-2">

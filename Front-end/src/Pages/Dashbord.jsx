@@ -32,7 +32,6 @@ function Dashbord() {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      signal: controller.signal,
     })
       .then((res) => {
         if (!res.ok) {
@@ -104,9 +103,9 @@ function Dashbord() {
   }
 
   return (
-    <section className="flex   h-screen">
+    <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
           DashBoards
         </h1>

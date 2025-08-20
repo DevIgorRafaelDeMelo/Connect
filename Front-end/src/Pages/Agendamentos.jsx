@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,19 +9,13 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import {
-  UserIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/solid";
 import Sidebar from "../Componets/Sidebar";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 function Agendamentos() {
   const hojeFiltro = new Date().toISOString().split("T")[0];
-
+  const navigate = useNavigate();
   const [agendamentos, setAgendamentos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [filtroStatus, setFiltroStatus] = useState("");
@@ -87,22 +83,22 @@ function Agendamentos() {
 
     let valorA = a[ordenarPor];
     let valorB = b[ordenarPor];
- 
+
     valorA = valorA ?? "";
     valorB = valorB ?? "";
- 
+
     if (ordenarPor === "DATA_ATENDIMENTO") {
       return ordemAscendente
         ? new Date(valorA) - new Date(valorB)
         : new Date(valorB) - new Date(valorA);
     }
- 
+
     if (typeof valorA === "string" && typeof valorB === "string") {
       return ordemAscendente
         ? valorA.localeCompare(valorB)
         : valorB.localeCompare(valorA);
     }
- 
+
     return ordemAscendente ? valorA - valorB : valorB - valorA;
   });
 
@@ -148,9 +144,9 @@ function Agendamentos() {
   }
 
   return (
-    <section className="flex h-screen  ">
+    <section className="flex  ">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh]  p-40">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
           Lista de Agendamentos
         </h1>
@@ -295,7 +291,7 @@ function Agendamentos() {
               <tr
                 key={a.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
-                onClick={() => window.open(`/cliente/${a.CPF}`, "_blank")}
+                onClick={() => navigate(`/cliente/${a.CPF}/${a.ID}`)}
               >
                 <td className="px-4 py-2">{a.CLIENTE_NOME}</td>
                 <td className="px-4 py-2">{a.CPF}</td>

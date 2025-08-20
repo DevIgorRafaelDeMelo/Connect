@@ -53,9 +53,9 @@ export default function Empresa() {
   }, [mostrarPopup, msg, pendencias]);
 
   return (
-    <section className="flex h-screen">
+    <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Agendamentos pendentes
         </h1>

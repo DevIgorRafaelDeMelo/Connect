@@ -325,11 +325,13 @@ const CalendarCard = ({ month, year, days }) => {
                   required
                 >
                   <option value="">Selecione...</option>
-                  {servicos.map((servico) => (
-                    <option key={servico.ID} value={servico.NOME}>
-                      {servico.NOME}
-                    </option>
-                  ))}
+                  {servicos
+                    .filter((s) => s.ATIVO === 1)
+                    .map((s) => (
+                      <option key={s.ID} value={s.NOME}>
+                        {s.NOME}
+                      </option>
+                    ))}
                 </select>
               </div>
 

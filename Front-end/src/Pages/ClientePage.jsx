@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../Componets/Sidebar";
 import PopupConfirmacao from "../Componets/Popup";
 import { FaCog } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function ClientePage() {
   const { id } = useParams();
@@ -11,12 +12,41 @@ function ClientePage() {
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [msg, setMsg] = useState("");
   const [aberto, setAberto] = useState(false);
+  const [filtroData, setFiltroData] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("");
+  const [ordem, setOrdem] = useState("asc");
+  const navigate = useNavigate();
+  const registrosFiltrados = registros
+    .filter((registro) => {
+      const dataFormatada = new Date(registro.DATA_ATENDIMENTO)
+        .toISOString()
+        .split("T")[0];
+
+      const correspondeData = filtroData ? dataFormatada === filtroData : true;
+      const correspondeStatus = filtroStatus
+        ? registro.STATUS === filtroStatus
+        : true;
+
+      return correspondeData && correspondeStatus;
+    })
+    .sort((a, b) => {
+      const dataA = new Date(a.DATA_ATENDIMENTO);
+      const dataB = new Date(b.DATA_ATENDIMENTO);
+
+      return ordem === "asc" ? dataA - dataB : dataB - dataA;
+    });
 
   const handleConfirmar = async (id, status) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
     try {
       const res = await fetch(`http://localhost:5000/AtualizaStatus/${id}`, {
         method: "PUT",
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ ATIVO: status }),
@@ -35,11 +65,21 @@ function ClientePage() {
 
   useEffect(() => {
     let isMounted = true;
-
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
     const fetchCliente = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/clientes/${id}`);
+        const res = await fetch(`http://localhost:5000/clientes/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         const data = await res.json();
+        console.log(data)
         if (isMounted) {
           setCliente(data.atendimento);
           setRegistros(data.registros);
@@ -59,9 +99,9 @@ function ClientePage() {
   if (!cliente) return <p>Carregando...</p>;
 
   return (
-    <section className="flex h-screen">
+    <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh]  py-20 p-44">
+      <div className="flex-1   w-[70vh] ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Dados do Cliente
         </h1>
@@ -158,15 +198,49 @@ function ClientePage() {
         <h2 className="text-2xl font-bold text-blue-800 pb-6">
           Histórico de Agendamentos
         </h2>
+        <div className="flex justify-end gap-4 mb-4 w-full">
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Data inicial
+            </label>
+            <input
+              type="date"
+              value={filtroData}
+              onChange={(e) => setFiltroData(e.target.value)}
+              className="border px-2 py-1 rounded"
+            />
+          </div>
 
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Status
+            </label>
+            <select
+              value={filtroStatus}
+              onChange={(e) => setFiltroStatus(e.target.value)}
+              className="border px-2 py-1 rounded"
+            >
+              <option value="">Todos os status</option>
+              <option value="REALIZADO">Realizado</option>
+              <option value="CANCELADO">Cancelado</option>
+              <option value="AGENDADO">Agendado</option>
+            </select>
+          </div>
+        </div>
         <table className="min-w-full divide-y divide-blue-100">
           <thead className="bg-blue-50">
             <tr>
               <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
                 Serviço
               </th>
-              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
-                Data
+              <th
+                className="px-4 py-2 text-left font-semibold text-sm text-blue-700 cursor-pointer"
+                onClick={() => setOrdem(ordem === "asc" ? "desc" : "asc")}
+              >
+                <div className="flex justify-between items-center w-full">
+                  <span>Data</span>
+                  <span>{ordem === "asc" ? "🔼" : "🔽"}</span>
+                </div>
               </th>
               <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
                 Hora
@@ -177,10 +251,13 @@ function ClientePage() {
             </tr>
           </thead>
           <tbody>
-            {registros.map((registro) => (
+            {registrosFiltrados.map((registro) => (
               <tr
                 key={registro.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
+                onClick={() =>
+                  navigate(`/clienteIdAgenda/${registro.CPF}/${registro.ID}`)
+                }
               >
                 <td className="px-4 py-2">{registro.TIPO_SERVICO}</td>
                 <td className="px-4 py-2">

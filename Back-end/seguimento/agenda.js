@@ -6,11 +6,11 @@ const agenda = async (req, res) => {
     const [results] = await db.query(
       "SELECT DATA_ATENDIMENTO, HORA_INICIO, HORA_FIM FROM AGENDA WHERE EMPRESA_ID = ? ORDER BY DATA_ATENDIMENTO, HORA_INICIO",
       [empresaId]
-    ); 
+    );
     const [servico] = await db.query(
-      "SELECT * FROM tipos_servico WHERE EMPRESA_ID = ?  ",
+      "SELECT * FROM tipos_servico WHERE EMPRESA_ID = ? AND ATIVO = 1",
       [empresaId]
-    ); 
+    );
     const [numero] = await db.query(
       "SELECT NUMERO FROM empresa WHERE ID = ?  ",
       [empresaId]

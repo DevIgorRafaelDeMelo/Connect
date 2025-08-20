@@ -18,8 +18,18 @@ export default function Colaboradores() {
     }
 
     const fetchClientes = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token não encontrado.");
+        return;
+      }
       try {
-        const res = await fetch(`http://localhost:5000/Colaboradores`);
+        const res = await fetch(`http://localhost:5000/Colaboradores`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         const data = await res.json();
         setRegistros(data.registros);
       } catch (error) {
@@ -32,12 +42,18 @@ export default function Colaboradores() {
 
   const atualizarServico = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
     try {
       const response = await fetch(
         `http://localhost:5000/ColaboradorId/${clienteSelecionado.ID}`,
         {
           method: "PUT",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -92,9 +108,9 @@ export default function Colaboradores() {
   };
 
   return (
-    <section className="flex h-screen">
+    <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Colaboradores
         </h1>

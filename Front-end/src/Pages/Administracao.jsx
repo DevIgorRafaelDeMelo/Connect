@@ -3,28 +3,37 @@ import Sidebar from "../Componets/Sidebar";
 
 function Administracao() {
   const [numero, setNumero] = useState();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEmpresas = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token não encontrado.");
+        return;
+      }
+
       try {
-        const controller = new AbortController();
-        const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:5000/Empresa", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          signal: controller.signal,
           body: JSON.stringify({ ID: 1 }),
         });
 
-        const data = await res.json();
-        setNumero(data.NUMERO[0].NUMERO);
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.erro || "Erro na requisição");
+        }
 
-        console.log(numero);
+        const data = await res.json();
+        setNumero(data.NUMERO);
       } catch (error) {
-        console.error("Erro ao buscar empresas:", error);
+        console.error("Erro ao buscar empresas:", error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -32,13 +41,18 @@ function Administracao() {
   }, []);
 
   return (
-    <section className="flex h-screen">
+    <section className="flex">
       <Sidebar />
-      <div className="flex-1 ml-[30vh] px-12 py-20">
+      <div className="flex-1 ml-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 mb-10">
           Administração
         </h1>
-        <p className="text-lg text-gray-900">Número: {numero}</p>
+
+        {loading ? (
+          <p>Carregando...</p>
+        ) : (
+          <p className="text-lg text-gray-900">Número: {numero}</p>
+        )}
       </div>
     </section>
   );

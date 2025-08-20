@@ -2,13 +2,7 @@ const db = require("./db");
 
 async function getClientByID(id) {
   try {
-    const cpfLimpo = id.replace(/\D/g, "");
-
-    const [rows] = await db.query(
-      "SELECT * FROM agenda WHERE REPLACE(REPLACE(REPLACE(CPF, '.', ''), '-', ''), ' ', '') = ?",
-      [cpfLimpo]
-    );
-
+    const [rows] = await db.query("SELECT * FROM agenda WHERE ID = ?", [id]);
     return rows.length > 0 ? rows[0] : null;
   } catch (error) {
     console.error("Erro ao buscar cliente por CPF:", error);

@@ -9,8 +9,19 @@ function Clientes() {
 
   useEffect(() => {
     const fetchClientes = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token não encontrado.");
+        return;
+      }
+
       try {
-        const res = await fetch(`http://localhost:5000/clientesList`);
+        const res = await fetch(`http://localhost:5000/clientesList`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         const data = await res.json();
         setClientes(data.registros);
       } catch (error) {
@@ -28,9 +39,9 @@ function Clientes() {
     .slice(0, 10);
 
   return (
-    <section className="flex h-screen">
+    <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Clientes
         </h1>
@@ -67,7 +78,7 @@ function Clientes() {
               <tr
                 key={cliente.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
-                onClick={() => navigate(`/ClientePageDados/${cliente.CPF}`)}
+                onClick={() => navigate(`/Clientes/${cliente.CPF}`)}
               >
                 <td className="px-4 py-2">{cliente.CLIENTE_NOME}</td>
                 <td className="px-4 py-2">{cliente.TELEFONE}</td>

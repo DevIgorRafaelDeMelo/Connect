@@ -23,8 +23,18 @@ export default function Servicos() {
     }
 
     const fetchClientes = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token não encontrado.");
+        return;
+      }
       try {
-        const res = await fetch(`http://localhost:5000/servicos`);
+        const res = await fetch(`http://localhost:5000/servicos`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         const data = await res.json();
         setRegistros(data.registros);
       } catch (error) {
@@ -36,6 +46,11 @@ export default function Servicos() {
   }, [clienteSelecionado, msg, mostrarPopup]);
 
   const atualizarServico = async (e) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
     e.preventDefault();
     try {
       const response = await fetch(
@@ -43,6 +58,7 @@ export default function Servicos() {
         {
           method: "PUT",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -73,17 +89,21 @@ export default function Servicos() {
       ativo,
     };
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
+
     try {
-      const response = await fetch(
-        `http://localhost:5000/CadastroServico`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(novoServico),
-        }
-      );
+      const response = await fetch(`http://localhost:5000/CadastroServico`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(novoServico),
+      });
 
       if (!response.ok) {
         throw new Error("Erro ao cadastrar serviço");
@@ -104,9 +124,9 @@ export default function Servicos() {
   };
 
   return (
-    <section className="flex h-screen">
+    <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">Serviços</h1>
         <div className="flex justify-end mb-8">
           <button

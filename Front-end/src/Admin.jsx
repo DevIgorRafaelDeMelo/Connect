@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext/useAuth";  
 
 function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-
   const navigate = useNavigate();
+  const { login } = useAuth();  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,15 +14,14 @@ function Login() {
     try {
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
       });
 
       const data = await response.json();
-      if (data.sucesso === true) {
-        localStorage.setItem("token", data.token);
+
+      if (data.sucesso === true && data.token) {
+        login(data.token);  
         navigate("/AdminPainel");
       } else {
         console.error("Erro:", data.mensagem || "Login inválido");
@@ -32,7 +32,7 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen ">
+    <div className="flex items-center justify-center min-h-screen">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
           Login

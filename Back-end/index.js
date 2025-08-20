@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -22,21 +23,24 @@ const ColaboradorId = require("./seguimento/ColaboradorId");
 const AtualizaStatus = require("./seguimento/AtualizaStatus");
 const Pendencias = require("./seguimento/Pendencias");
 const CadastroServico = require("./seguimento/CadastroServico");
+const clienteIdAgenda = require("./seguimento/ClienteIdAgenda")
 
+app.post("/login", login);
 app.post("/agenda", agenda);
 app.post("/comfirmagendamento", comfirmagendamento);
-app.post("/login", login);
 app.post("/agendamentos", agendamentos);
-app.use("/clientes", clientes);
-app.use("/clientesList", clientesList);
-app.post("/Empresa", Empresa);
-app.use("/servicos", Servicos);
-app.use("/servicosId", ServicosId);
-app.use("/Colaboradores", Colaboradores);
-app.use("/ColaboradorId", ColaboradorId);
-app.use("/AtualizaStatus", AtualizaStatus);
-app.use("/Pendencias", Pendencias);
-app.use("/CadastroServico", CadastroServico);
+
+app.use("/clientes", authMiddleware, clientes);
+app.use("/clienteIdAgenda", authMiddleware, clienteIdAgenda);
+app.use("/clientesList", authMiddleware, clientesList);
+app.post("/Empresa", authMiddleware, Empresa);
+app.use("/servicos", authMiddleware, Servicos);
+app.use("/servicosId", authMiddleware, ServicosId);
+app.use("/Colaboradores", authMiddleware, Colaboradores);
+app.use("/ColaboradorId", authMiddleware, ColaboradorId);
+app.use("/AtualizaStatus", authMiddleware, AtualizaStatus);
+app.use("/Pendencias", authMiddleware, Pendencias);
+app.use("/CadastroServico", authMiddleware, CadastroServico);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

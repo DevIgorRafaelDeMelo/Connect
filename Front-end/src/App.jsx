@@ -14,6 +14,7 @@ import ClientePageDados from "./Pages/ClienteDados";
 import Pendencias from "./Pages/Pendencias";
 import Agendar from "./Pages/Agendar";
 import Administracao from "./Pages/Administracao";
+import { useAuth } from "./AuthContext/useAuth";
 
 function App() {
   return (
@@ -45,7 +46,7 @@ function App() {
         }
       />
       <Route
-        path="/cliente/:id"
+        path="/clientes/:id"
         element={
           <RotaProtegida>
             <ClientePage />
@@ -122,9 +123,9 @@ function App() {
 }
 
 function RotaProtegida({ children }) {
-  const token = localStorage.getItem("token");
+  const { isAuthenticated } = useAuth();
 
-  if (!token) {
+  if (!isAuthenticated) {
     return <Navigate to="/Admin" replace />;
   }
 

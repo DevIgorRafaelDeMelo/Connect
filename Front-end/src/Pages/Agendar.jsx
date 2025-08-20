@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../Componets/Sidebar";
 import CalendarCard from "../Componets/CalendarCard";
-import { getMonthDays } from "../../utils/getMonthDays"; 
+import { getMonthDays } from "../../utils/getMonthDays";
 
 function Agendar() {
   const [agenda, setAgenda] = useState([]);
@@ -33,10 +33,16 @@ function Agendar() {
 
   useEffect(() => {
     const fetchAgenda = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token não encontrado.");
+        return;
+      }
       try {
         const response = await fetch("http://localhost:5000/agenda", {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ ID: 1 }),
@@ -56,9 +62,9 @@ function Agendar() {
   }, [agenda]);
 
   return (
-    <section className="flex h-screen  ">
+    <section className="flex   ">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] py-20 p-48">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-40">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
           Agendar
         </h1>
