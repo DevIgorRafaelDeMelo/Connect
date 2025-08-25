@@ -53,6 +53,14 @@ function App() {
           </RotaProtegida>
         }
       />
+       <Route
+        path="/cliente/:id/:cpf"
+        element={
+          <RotaProtegida>
+            <ClientePage />
+          </RotaProtegida>
+        }
+      />
       <Route
         path="/clientes"
         element={

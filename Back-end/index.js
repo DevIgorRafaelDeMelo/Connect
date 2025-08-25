@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -23,13 +22,14 @@ const ColaboradorId = require("./seguimento/ColaboradorId");
 const AtualizaStatus = require("./seguimento/AtualizaStatus");
 const Pendencias = require("./seguimento/Pendencias");
 const CadastroServico = require("./seguimento/CadastroServico");
-const clienteIdAgenda = require("./seguimento/ClienteIdAgenda")
+const clienteIdAgenda = require("./seguimento/ClienteIdAgenda");
+const clienteIdCpf = require("./seguimento/clientesIdCpf");
 
 app.post("/login", login);
 app.post("/agenda", agenda);
 app.post("/comfirmagendamento", comfirmagendamento);
 app.post("/agendamentos", agendamentos);
-
+app.use("/clienteIdCpf", authMiddleware, clienteIdCpf);
 app.use("/clientes", authMiddleware, clientes);
 app.use("/clienteIdAgenda", authMiddleware, clienteIdAgenda);
 app.use("/clientesList", authMiddleware, clientesList);

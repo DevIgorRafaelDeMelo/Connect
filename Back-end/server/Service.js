@@ -37,6 +37,17 @@ async function getClients(cpf) {
   }
 }
 
+async function getClientsAgenda(cpf) {
+  try {
+    const [rows] = await db.query("SELECT  * FROM agenda WHERE ID = ?", [cpf]);
+
+    return rows[0];
+  } catch (error) {
+    console.error("Erro ao buscar clientes por CPF:", error);
+    throw error;
+  }
+}
+
 async function getServicos() {
   try {
     const [rows] = await db.query("SELECT  * FROM tipos_servico ");
@@ -63,4 +74,5 @@ module.exports = {
   getClients,
   getServicos,
   getColaboradores,
+  getClientsAgenda,
 };

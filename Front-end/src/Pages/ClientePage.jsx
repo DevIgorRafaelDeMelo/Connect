@@ -6,7 +6,7 @@ import { FaCog } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function ClientePage() {
-  const { id } = useParams();
+  const { id, cpf } = useParams(); 
   const [cliente, setCliente] = useState(null);
   const [registros, setRegistros] = useState([]);
   const [mostrarPopup, setMostrarPopup] = useState(false);
@@ -72,14 +72,16 @@ function ClientePage() {
     }
     const fetchCliente = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/clientes/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch(
+          `http://localhost:5000/clienteIdCpf/${id}/${cpf}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = await res.json();
-        console.log(data)
         if (isMounted) {
           setCliente(data.atendimento);
           setRegistros(data.registros);
@@ -94,7 +96,7 @@ function ClientePage() {
     return () => {
       isMounted = false;
     };
-  }, [id, msg]);
+  }, [id, msg, cliente, registros, cpf]);
 
   if (!cliente) return <p>Carregando...</p>;
 
@@ -255,9 +257,10 @@ function ClientePage() {
               <tr
                 key={registro.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
-                onClick={() =>
-                  navigate(`/clienteIdAgenda/${registro.CPF}/${registro.ID}`)
-                }
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate(`/cliente/${registro.CPF}/${registro.ID}`);
+                }}
               >
                 <td className="px-4 py-2">{registro.TIPO_SERVICO}</td>
                 <td className="px-4 py-2">
