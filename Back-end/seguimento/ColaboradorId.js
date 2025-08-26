@@ -2,100 +2,67 @@ const express = require("express");
 const router = express.Router();
 const db = require("../server/db");
 
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const { NOME, CARGO, ATIVO, EXPEDIENTE } = req.body;
+  console.log(ATIVO);
+  try {
+    const queryFuncionario = `
+      UPDATE FUNCIONARIOS
+      SET NOME = ?, CARGO = ?, STATUS = ?
+      WHERE ID = ?
+    `;
+    await db.execute(queryFuncionario, [NOME, CARGO, ATIVO, id]);
 
-  const queryFuncionario = `
-    UPDATE FUNCIONARIOS
-    SET NOME = ?, CARGO = ?, STATUS = ?
-    WHERE ID = ?
-  `;
+    const dias = Object.entries(EXPEDIENTE).filter(([_, dados]) => dados.ativo);
 
-  db.query(queryFuncionario, [NOME, CARGO, ATIVO, id]);
+    for (const [dia, dados] of dias) {
+      const { ativo, inicio, pausaInicio, pausaFim, fim } = dados;
 
-  const dias = Object.entries(EXPEDIENTE).filter(([_, dados]) => dados.ativo);
-
-  const promessas = dias.map(([dia, dados]) => {
-    const { ativo, inicio, pausaInicio, pausaFim, fim } = dados;
-
-    return new Promise((resolve, reject) => {
       const checkQuery = `
         SELECT ID FROM EXPEDIENTE_FUNCIONARIOS
         WHERE FUNCIONARIO_ID = ? AND DIA_SEMANA = ?
       `;
+      const [results] = await db.execute(checkQuery, [id, dia]);
 
-      db.query(checkQuery, [id, dia], (err, results) => {
-        if (err) {
-          console.error(`Erro ao verificar expediente de ${dia}:`, err);
-          return reject(err);
-        }
-        console.log(results)
-        if (results.length > 0) { 
-          console.log()
-          const updateQuery = `
-            UPDATE EXPEDIENTE_FUNCIONARIOS
-            SET ATIVO = ?, INICIO = ?, PAUSA_INICIO = ?, PAUSA_FIM = ?, FIM = ?
-            WHERE FUNCIONARIO_ID = ? AND DIA_SEMANA = ?
-          `;
-          db.query(
-            updateQuery,
-            [
-              ativo,
-              inicio || null,
-              pausaInicio || null,
-              pausaFim || null,
-              fim || null,
-              id,
-              dia,
-            ],
-            (err) => {
-              if (err) {
-                console.error(`Erro ao atualizar expediente de ${dia}:`, err);
-                return reject(err);
-              }
-              resolve();
-            }
-          );
-        } else {  
-          const insertQuery = `
-            INSERT INTO EXPEDIENTE_FUNCIONARIOS 
-            (FUNCIONARIO_ID, DIA_SEMANA, ATIVO, INICIO, PAUSA_INICIO, PAUSA_FIM, FIM)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-          `;
-          db.query(
-            insertQuery,
-            [
-              id,
-              dia,
-              ativo,
-              inicio || null,
-              pausaInicio || null,
-              pausaFim || null,
-              fim || null,
-            ],
-            (err) => {
-              if (err) {
-                console.error(`Erro ao inserir expediente de ${dia}:`, err);
-                return reject(err);
-              }
-              resolve();
-            }
-          );
-        }
-      });
-    });
-  });
+      if (results.length > 0) {
+        const updateQuery = `
+          UPDATE EXPEDIENTE_FUNCIONARIOS
+          SET ATIVO = ?, INICIO = ?, PAUSA_INICIO = ?, PAUSA_FIM = ?, FIM = ?
+          WHERE FUNCIONARIO_ID = ? AND DIA_SEMANA = ?
+        `;
+        await db.execute(updateQuery, [
+          ativo,
+          inicio || null,
+          pausaInicio || null,
+          pausaFim || null,
+          fim || null,
+          id,
+          dia,
+        ]);
+      } else {
+        const insertQuery = `
+          INSERT INTO EXPEDIENTE_FUNCIONARIOS
+          (FUNCIONARIO_ID, DIA_SEMANA, ATIVO, INICIO, PAUSA_INICIO, PAUSA_FIM, FIM)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        await db.execute(insertQuery, [
+          id,
+          dia,
+          ativo,
+          inicio || null,
+          pausaInicio || null,
+          pausaFim || null,
+          fim || null,
+        ]);
+      }
+    }
 
-  Promise.all(promessas)
-    .then(() => {
-      return res.json({ message: "Serviço atualizado com sucesso" });
-    })
-    .catch((err) => {
-      return res
-        .status(500)
-        .json({ error: "Erro ao inserir/atualizar expediente" });
-    });
+    res.json({ message: "Serviço atualizado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao atualizar funcionário ou expediente:", error);
+    res.status(500).json({ error: "Erro interno ao salvar expediente" });
+  }
 });
 
 module.exports = router;

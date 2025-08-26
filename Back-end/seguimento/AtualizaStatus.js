@@ -6,6 +6,7 @@ router.put("/:id", (req, res) => {
   const id = parseInt(req.params.id);
 
   const { ATIVO } = req.body;
+  console.log(ATIVO)
   const query = `
     UPDATE agenda
     SET STATUS = ?

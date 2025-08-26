@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Sidebar from "../Componets/Sidebar";
+import { useNavigate } from "react-router-dom";
 import {
   FaGem,
   FaStarHalfAlt,
@@ -8,13 +9,15 @@ import {
   FaCircle,
   FaCrown,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 
-function ClientePageDados() {
-  const navigate = useNavigate();
-  const { cpf } = useParams();
+function ClienteId() {
+  const { id } = useParams();
   const [cliente, setCliente] = useState(null);
-  const [registros, setRegistros] = useState([]);
+  const [registros, setRegistros] = useState([null]);
+  const [filtroData, setFiltroData] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("");
+  const [ordem, setOrdem] = useState("asc");
+  const navigate = useNavigate();
 
   const nivelEstilo = {
     1: { color: "text-gray-500", label: "Prata", icon: FaCircle },
@@ -33,7 +36,7 @@ function ClientePageDados() {
     }
     const fetchCliente = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/clientes/${cpf}`, {
+        const res = await fetch(`http://localhost:5000/clientes/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -42,8 +45,8 @@ function ClientePageDados() {
         const data = await res.json();
 
         if (isMounted) {
-          setCliente(data.atendimento);
           setRegistros(data.registros);
+          setCliente(data.cliente);
         }
       } catch (error) {
         console.error("Erro ao buscar cliente:", error);
@@ -55,8 +58,10 @@ function ClientePageDados() {
     return () => {
       isMounted = false;
     };
-  }, [cpf]);
+  }, [id]);
 
+  if (!cliente) return <p>Carregando...</p>;
+  if (!registros) return <p>Carregando...</p>;
   const realizados = registros.filter((item) => item.STATUS === "REALIZADO");
   const totalRealizados = realizados.length;
 
@@ -72,17 +77,15 @@ function ClientePageDados() {
   const estilo = nivelEstilo[nivel];
   const Icon = estilo.icon;
 
-  if (!cliente) return <p>Carregando...</p>;
-
   return (
     <section className="flex">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-44">
+      <div className="flex-1 w-[70vh] ms-[30vh] p-44">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Dados do Cliente
         </h1>
 
-        <div className="mb-10 bg-white p-6 rounded-xl shadow-lg flex flex-col md:flex-row justify-between items-start gap-6">
+        <div className="mb-10 bg-white p-6  flex flex-col md:flex-row justify-between items-start gap-6">
           <div className="">
             <div>
               <strong>Nome:</strong> {cliente.CLIENTE_NOME}
@@ -111,15 +114,48 @@ function ClientePageDados() {
         <h2 className="text-2xl font-bold text-blue-800 pb-6">
           Histórico de Agendamentos
         </h2>
+        <div className="flex justify-end gap-4 mb-4 w-full">
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Data inicial
+            </label>
+            <input
+              type="date"
+              value={filtroData}
+              onChange={(e) => setFiltroData(e.target.value)}
+              className="border px-2 py-1 rounded"
+            />
+          </div>
 
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Status
+            </label>
+            <select
+              value={filtroStatus}
+              onChange={(e) => setFiltroStatus(e.target.value)}
+              className="border px-2 py-1 rounded"
+            >
+              <option value="">Todos os status</option>
+              <option value="REALIZADO">Realizado</option>
+              <option value="CANCELADO">Cancelado</option>
+              <option value="AGENDADO">Agendado</option>
+            </select>
+          </div>
+        </div>
         <table className="min-w-full divide-y divide-blue-100">
           <thead className="bg-blue-50">
             <tr>
               <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
                 Serviço
               </th>
-              <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
-                Data
+              <th
+                className="px-4 py-2 text-left font-semibold text-sm text-blue-700 cursor-pointer"
+                onClick={() => setOrdem(ordem === "asc" ? "desc" : "asc")}
+              >
+                <div className="flex justify-between items-center w-full">
+                  <span>Data</span>
+                </div>
               </th>
               <th className="px-4 py-2 text-left font-semibold text-sm text-blue-700">
                 Hora
@@ -134,9 +170,10 @@ function ClientePageDados() {
               <tr
                 key={registro.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
-                onClick={() =>
-                  navigate(`/clienteIdAgenda/${registro.CPF}/${registro.ID}`)
-                }
+                onClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate(`/cliente/${registro.CPF}/${registro.ID}`);
+                }}
               >
                 <td className="px-4 py-2">{registro.TIPO_SERVICO}</td>
                 <td className="px-4 py-2">
@@ -169,4 +206,4 @@ function ClientePageDados() {
   );
 }
 
-export default ClientePageDados;
+export default ClienteId;

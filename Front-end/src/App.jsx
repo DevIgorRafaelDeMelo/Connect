@@ -11,9 +11,11 @@ import Empresa from "./Pages/Empresa";
 import Servicos from "./Pages/Servicos";
 import Colaboradores from "./Pages/Colaboradores";
 import ClientePageDados from "./Pages/ClienteDados";
+import ClienteId from "./Pages/ClienteId";
 import Pendencias from "./Pages/Pendencias";
 import Agendar from "./Pages/Agendar";
 import Administracao from "./Pages/Administracao";
+import Feriados from "./Pages/Feriados";
 import { useAuth } from "./AuthContext/useAuth";
 
 function App() {
@@ -46,14 +48,14 @@ function App() {
         }
       />
       <Route
-        path="/clientes/:id"
+        path="/clienteId/:id"
         element={
           <RotaProtegida>
-            <ClientePage />
+            <ClienteId />
           </RotaProtegida>
         }
       />
-       <Route
+      <Route
         path="/cliente/:id/:cpf"
         element={
           <RotaProtegida>
@@ -125,6 +127,15 @@ function App() {
             <Administracao />
           </RotaProtegida>
         }
+      />
+      <Route
+        path="/feriados"
+        element={
+          <RotaProtegida>
+            <Feriados />
+          </RotaProtegida>
+        }
+        feriados
       />
     </Routes>
   );

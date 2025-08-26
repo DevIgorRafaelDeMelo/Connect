@@ -10,6 +10,19 @@ async function getClientByID(id) {
   }
 }
 
+async function getClientByIdUser(id) {
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM clientes WHERE REPLACE(REPLACE(REPLACE(CPF, '.', ''), '-', ''), ' ', '')  = ?",
+      [id]
+    );
+    return rows.length > 0 ? rows[0] : null;
+  } catch (error) {
+    console.error("Erro ao buscar cliente por CPF:", error);
+    throw error;
+  }
+}
+
 async function getClientsByCPF(cpf) {
   try {
     const cpfLimpo = cpf.replace(/\D/g, "");
@@ -26,7 +39,7 @@ async function getClientsByCPF(cpf) {
   }
 }
 
-async function getClients(cpf) {
+async function getClients() {
   try {
     const [rows] = await db.query("SELECT  * FROM clientes ");
 
@@ -37,9 +50,9 @@ async function getClients(cpf) {
   }
 }
 
-async function getClientsAgenda(cpf) {
+async function getClientsAgenda(id) {
   try {
-    const [rows] = await db.query("SELECT  * FROM agenda WHERE ID = ?", [cpf]);
+    const [rows] = await db.query("SELECT  * FROM agenda WHERE ID = ?", [id]);
 
     return rows[0];
   } catch (error) {
@@ -75,4 +88,5 @@ module.exports = {
   getServicos,
   getColaboradores,
   getClientsAgenda,
+  getClientByIdUser,
 };

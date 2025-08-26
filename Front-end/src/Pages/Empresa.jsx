@@ -39,7 +39,7 @@ export default function Empresa() {
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] p-40">
+      <div className="flex-1 p-8 ms-[30vh] p-44">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Painel de Gestão
         </h1>
@@ -150,6 +150,34 @@ export default function Empresa() {
             </div>
             <p className="text-gray-600">
               Acesse configurações administrativas e controle geral do sistema.
+            </p>
+          </Link>
+
+          <Link
+            to="/feriados"
+            className="bg-white border rounded-xl p-8 shadow hover:shadow-lg cursor-pointer transition block"
+          >
+            <div className="flex items-center mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-blue-800 mr-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <h2 className="text-2xl font-semibold text-blue-800">
+                Feriados & Dispensas
+              </h2>
+            </div>
+            <p className="text-gray-600">
+              Gerencie feriados oficiais e dias de dispensa dos colaboradores.
             </p>
           </Link>
         </div>

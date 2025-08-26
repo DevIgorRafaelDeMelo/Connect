@@ -41,7 +41,7 @@ function Clientes() {
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-40">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-44">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Clientes
         </h1>
@@ -78,7 +78,7 @@ function Clientes() {
               <tr
                 key={cliente.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
-                onClick={() => navigate(`/Clientes/${cliente.CPF}`)}
+                onClick={() => navigate(`/ClienteId/${cliente.CPF}`)}
               >
                 <td className="px-4 py-2">{cliente.CLIENTE_NOME}</td>
                 <td className="px-4 py-2">{cliente.TELEFONE}</td>

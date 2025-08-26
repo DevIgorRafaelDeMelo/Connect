@@ -7,7 +7,7 @@ export default function Colaboradores() {
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
   const [nome, setNome] = useState("");
   const [cargo, setCargo] = useState("");
-  const [ativo, setAtivo] = useState(1);
+  const [ativo, setAtivo] = useState("0");
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -110,7 +110,7 @@ export default function Colaboradores() {
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] p-40">
+      <div className="flex-1 p-8 ms-[30vh] p-44">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Colaboradores
         </h1>
@@ -141,10 +141,13 @@ export default function Colaboradores() {
                 <td className="px-4 py-2">
                   <span
                     className={`font-medium ${
-                      Registro.STATUS === 1 ? "text-green-600" : "text-red-600"
+                      (console.log(Registro.STATUS),
+                      Registro.STATUS === "0"
+                        ? "text-green-600"
+                        : "text-red-600")
                     }`}
                   >
-                    {Registro.STATUS === 1 ? "Ativo" : "Inativo"}
+                    {Registro.STATUS === "0" ? "Ativo" : "Inativo"}
                   </span>
                 </td>
               </tr>
@@ -199,8 +202,8 @@ export default function Colaboradores() {
                   value={ativo}
                   onChange={(e) => setAtivo(Number(e.target.value))}
                 >
-                  <option value={1}>Ativo</option>
-                  <option value={0}>Inativo</option>
+                  <option value={0}>Ativo</option>
+                  <option value={1}>Inativo</option>
                 </select>
               </div>
 

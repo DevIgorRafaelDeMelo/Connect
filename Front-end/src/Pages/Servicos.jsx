@@ -126,7 +126,7 @@ export default function Servicos() {
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] p-40">
+      <div className="flex-1 p-8 ms-[30vh] p-44">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">Serviços</h1>
         <div className="flex justify-end mb-8">
           <button

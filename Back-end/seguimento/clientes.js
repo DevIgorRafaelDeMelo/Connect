@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const { getClientByID, getClientsByCPF } = require("../server/Service");
+const { getClientsByCPF, getClientByIdUser } = require("../server/Service");
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   console.log(id)
   try {
-    const atendimento = await getClientByID(id);
     const registros = await getClientsByCPF(id);
-    console.log(atendimento, registros)
-    if (atendimento) {
+    const cliente = await getClientByIdUser(id);
+    console.log(cliente, registros);
+    if (registros) {
       res.json({
-        atendimento,
         registros,
+        cliente,
       });
     } else {
       res.status(404).json({ erro: "Cliente não encontrado" });
