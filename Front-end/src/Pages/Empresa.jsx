@@ -25,9 +25,7 @@ export default function Empresa() {
           const errorData = await res.json();
           throw new Error(errorData.erro || "Erro na requisição");
         }
-
-        const data = await res.json();
-        console.log("Dados da empresa:", data);
+ 
       } catch (error) {
         console.error("Erro ao buscar empresas:", error.message);
       }

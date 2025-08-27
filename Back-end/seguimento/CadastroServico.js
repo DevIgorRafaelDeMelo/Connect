@@ -2,21 +2,20 @@ const db = require("../server/db");
 
 const CadastroServico = async (req, res) => {
   const { descricao, valor, horarios, ativo } = req.body;
+  const horariosInt = parseInt(horarios, 10);
+  const valorDecimal = Number(parseFloat(valor).toFixed(2));
 
-  if (!descricao || !valor || !horarios || ativo === undefined) {
-    return res.status(400).json({ erro: "Todos os campos são obrigatórios." });
-  }
+ 
 
   try {
     const insertQuery = `
-      INSERT INTO tipos_servico (NOME, VALOR, HORARIOS, ATIVO)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO tipos_servico (id - eempressa, NOME, VALOR, HORARIOS)
+      VALUES (?, ?, ?)
     `;
     const [resultado] = await db.execute(insertQuery, [
       descricao,
-      valor,
-      horarios,
-      ativo,
+      valorDecimal,
+      horariosInt,
     ]);
 
     const selectQuery = `

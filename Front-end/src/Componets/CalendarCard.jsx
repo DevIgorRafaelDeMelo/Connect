@@ -346,6 +346,7 @@ const CalendarCard = ({ month, year, days }) => {
                     selectedTime,
                     selectedDay,
                     onSuccess: () => {
+                      setMostrarPopup(true);
                       setMsg("Agendamento confirmado!");
                       setShowConfirmModal(false);
                       setShowFormModal(false);

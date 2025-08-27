@@ -55,8 +55,7 @@ function Agendamentos() {
     const horaValida = filtroHora ? a.HORA_INICIO === filtroHora : true;
     const tipoValido = filtroTipoServico
       ? a.TIPO_SERVICO.toLowerCase().includes(filtroTipoServico.toLowerCase())
-      : true;
-    console.log(typeof a.CPF);
+      : true; 
     const cpfValido = filtroCPF ? a.CPF.includes(filtroCPF) : true;
 
     return (

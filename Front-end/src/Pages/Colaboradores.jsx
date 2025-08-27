@@ -141,7 +141,7 @@ export default function Colaboradores() {
                 <td className="px-4 py-2">
                   <span
                     className={`font-medium ${
-                      (console.log(Registro.STATUS),
+                      
                       Registro.STATUS === "0"
                         ? "text-green-600"
                         : "text-red-600")

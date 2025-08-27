@@ -109,8 +109,9 @@ export default function Servicos() {
         throw new Error("Erro ao cadastrar serviço");
       }
 
-      const resultado = await response.json();
-      console.log("Serviço cadastrado com sucesso:", resultado);
+      const data = await response.json();
+      setMostrarPopup(true);
+      setMsg(data.message);
 
       setDescricao("");
       setValor("");

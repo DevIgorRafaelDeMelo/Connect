@@ -69,8 +69,8 @@ function ClientePage() {
 
       const data = await res.json();
 
-      setMsg(data.message);
       setMostrarPopup(true);
+      setMsg(data.message);
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
       setMsg("Erro ao atualizar serviço");

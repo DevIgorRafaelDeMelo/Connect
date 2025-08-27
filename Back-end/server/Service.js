@@ -81,6 +81,16 @@ async function getColaboradores() {
   }
 }
 
+async function getDispensas() {
+  try {
+    const [rows] = await db.query("SELECT  * FROM dispensas ");
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getClientByID,
   getClientsByCPF,
@@ -89,4 +99,5 @@ module.exports = {
   getColaboradores,
   getClientsAgenda,
   getClientByIdUser,
+  getDispensas,
 };

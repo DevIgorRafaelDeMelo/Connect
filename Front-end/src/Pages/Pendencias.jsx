@@ -9,10 +9,17 @@ export default function Empresa() {
   const [msg, setMsg] = useState("");
 
   const handleConfirmar = async (id, status) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.warn("Token não encontrado");
+      return;
+    }
     try {
       const res = await fetch(`http://localhost:5000/AtualizaStatus/${id}`, {
         method: "PUT",
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ ATIVO: status }),
@@ -20,8 +27,8 @@ export default function Empresa() {
 
       const data = await res.json();
 
-      setMsg(data.message);
       setMostrarPopup(true);
+      setMsg(data.message);
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
       setMsg("Erro ao atualizar serviço");

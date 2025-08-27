@@ -3,11 +3,14 @@ import React, { useEffect } from "react";
 const PopupConfirmacao = ({ mensagem, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      onClose();
-    }, 1000); // 1 segundo
-
+      try {
+        onClose();
+      } catch (e) {
+        console.error("Erro ao fechar popup:", e);
+      }
+    }, 1000);
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, []);
 
   return (
     <div className="fixed top-6 right-6 z-50">

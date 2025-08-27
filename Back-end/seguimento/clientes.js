@@ -4,11 +4,11 @@ const { getClientsByCPF, getClientByIdUser } = require("../server/Service");
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  console.log(id)
+
   try {
     const registros = await getClientsByCPF(id);
     const cliente = await getClientByIdUser(id);
-    console.log(cliente, registros);
+
     if (registros) {
       res.json({
         registros,

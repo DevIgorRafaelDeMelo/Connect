@@ -5,7 +5,7 @@ const db = require("../server/db");
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const { NOME, CARGO, ATIVO, EXPEDIENTE } = req.body;
-  console.log(ATIVO);
+
   try {
     const queryFuncionario = `
       UPDATE FUNCIONARIOS
