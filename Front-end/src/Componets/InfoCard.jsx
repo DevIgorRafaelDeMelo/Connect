@@ -8,9 +8,9 @@ import {
 
 const colorMap = {
   blue: { bg: "bg-blue-100", text: "text-blue-600" },
-  green: { bg: "bg-green-100", text: "text-green-600" },
-  yellow: { bg: "bg-yellow-100", text: "text-yellow-500" },
-  gray: { bg: "bg-gray-100", text: "text-gray-600" },
+  green: { bg: "bg-blue-300", text: "text-green-600" },
+  yellow: { bg: "bg-blue-500", text: "text-yellow-500" },
+  gray: { bg: "bg-blue-700", text: "text-white" },
 };
 
 const iconMap = {

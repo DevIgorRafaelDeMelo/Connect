@@ -1,13 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const { getColaboradores, getDispensas  } = require("../server/Service");
+const {
+  getColaboradores,
+  getDispensas,
+  getDepartamento,
+  getCargos,
+} = require("../server/Service");
 
 router.get("/", async (req, res) => {
   try {
     const registros = await getColaboradores();
-    const dispensas = await getDispensas()
+    const dispensas = await getDispensas();
+    const cargo = await getCargos();
+    const departamento = await getDepartamento();
+
     if (registros) {
-      res.json({ registros, dispensas });
+      res.json({ registros, dispensas, cargo, departamento });
     } else {
       res.status(404).json({ erro: "Cliente não encontrado" });
     }

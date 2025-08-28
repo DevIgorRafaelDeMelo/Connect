@@ -14,6 +14,7 @@ router.put("/:id", async (req, res) => {
       );
     }
 
+
     res.json({ message: "Dados atualizados com sucesso!" });
   } catch (error) {
     console.error("Erro ao atualizar colaborador:", error);

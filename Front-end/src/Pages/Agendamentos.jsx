@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import LoadingSpinner from "../Componets/LoadingSpinner";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -55,7 +55,7 @@ function Agendamentos() {
     const horaValida = filtroHora ? a.HORA_INICIO === filtroHora : true;
     const tipoValido = filtroTipoServico
       ? a.TIPO_SERVICO.toLowerCase().includes(filtroTipoServico.toLowerCase())
-      : true; 
+      : true;
     const cpfValido = filtroCPF ? a.CPF.includes(filtroCPF) : true;
 
     return (
@@ -138,14 +138,12 @@ function Agendamentos() {
     return () => controller.abort();
   }, []);
 
-  if (carregando) {
-    return <div>Carregando dados do dashboard...</div>;
-  }
+  if (carregando) return <LoadingSpinner texto="Buscando dados..." />;
 
   return (
     <section className="flex">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-44">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
           Lista de Agendamentos
         </h1>

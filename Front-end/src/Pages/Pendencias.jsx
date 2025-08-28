@@ -1,12 +1,35 @@
 import { useEffect, useState } from "react";
 import PopupConfirmacao from "../Componets/Popup";
 import Sidebar from "../Componets/Sidebar";
-import { Link } from "react-router-dom";
+import LoadingSpinner from "../Componets/LoadingSpinner";
 
 export default function Empresa() {
   const [pendencias, setPendencias] = useState([]);
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    const fetchEmpresas = async () => {
+      try {
+        const controller = new AbortController();
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:5000/Pendencias", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          signal: controller.signal,
+        });
+        const data = await res.json();
+        setPendencias(data);
+      } catch (error) {
+        console.error("Erro ao buscar empresas:", error);
+      }
+    };
+
+    fetchEmpresas();
+  }, [mostrarPopup, msg, pendencias]);
 
   const handleConfirmar = async (id, status) => {
     const token = localStorage.getItem("token");
@@ -36,33 +59,12 @@ export default function Empresa() {
     }
   };
 
-  useEffect(() => {
-    const fetchEmpresas = async () => {
-      try {
-        const controller = new AbortController();
-        const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:5000/Pendencias", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          signal: controller.signal,
-        });
-        const data = await res.json();
-        setPendencias(data);
-      } catch (error) {
-        console.error("Erro ao buscar empresas:", error);
-      }
-    };
-
-    fetchEmpresas();
-  }, [mostrarPopup, msg, pendencias]);
+  if (!pendencias) return <LoadingSpinner texto="Buscando dados..." />;
 
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] p-44">
+      <div className="flex-1 p-8 ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Agendamentos pendentes
         </h1>

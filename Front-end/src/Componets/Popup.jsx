@@ -10,7 +10,7 @@ const PopupConfirmacao = ({ mensagem, onClose }) => {
       }
     }, 1000);
     return () => clearTimeout(timer);
-  }, []);
+  });
 
   return (
     <div className="fixed top-6 right-6 z-50">

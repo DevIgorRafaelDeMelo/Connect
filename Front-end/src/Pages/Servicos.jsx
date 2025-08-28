@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../Componets/Sidebar";
 import PopupConfirmacao from "../Componets/Popup";
+import LoadingSpinner from "../Componets/LoadingSpinner";
 
 export default function Servicos() {
   const [registro, setRegistros] = useState([]);
@@ -112,7 +113,6 @@ export default function Servicos() {
       const data = await response.json();
       setMostrarPopup(true);
       setMsg(data.message);
-
       setDescricao("");
       setValor("");
       setHorarios("");
@@ -124,10 +124,12 @@ export default function Servicos() {
     }
   };
 
+  if (!registro) return <LoadingSpinner texto="Buscando dados..." />;
+
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] p-44">
+      <div className="flex-1 p-8 ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">Serviços</h1>
         <div className="flex justify-end mb-8">
           <button

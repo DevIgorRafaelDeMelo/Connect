@@ -5,8 +5,6 @@ const CadastroServico = async (req, res) => {
   const horariosInt = parseInt(horarios, 10);
   const valorDecimal = Number(parseFloat(valor).toFixed(2));
 
- 
-
   try {
     const insertQuery = `
       INSERT INTO tipos_servico (id - eempressa, NOME, VALOR, HORARIOS)

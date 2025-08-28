@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../Componets/Sidebar";
 import CalendarCard from "../Componets/CalendarCard";
 import { getMonthDays } from "../../utils/getMonthDays";
+import LoadingSpinner from "../Componets/LoadingSpinner";
 
 function Agendar() {
   const [agenda, setAgenda] = useState([]);
@@ -61,10 +62,13 @@ function Agendar() {
     fetchAgenda();
   }, [agenda]);
 
+  if (!agenda) return <LoadingSpinner texto="Buscando dados..." />;
+
+
   return (
     <section className="flex">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-44">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
           Agendar
         </h1>

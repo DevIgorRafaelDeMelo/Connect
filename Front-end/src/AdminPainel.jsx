@@ -1,5 +1,5 @@
 import React from "react";
-import Sidebar from "./Componets/Sidebar";
+import Sidebar from "./Componets/Sidebar"; 
 
 function AdminPainel() {
   return (
@@ -10,21 +10,21 @@ function AdminPainel() {
           Painel de Gestão
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"> 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
             <h2 className="text-xl font-semibold text-blue-800 mb-2">
               Agendamentos
             </h2>
             <p className="text-gray-600">Hoje: 5 agendamentos confirmados</p>
           </div>
- 
+
           <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
             <h2 className="text-xl font-semibold text-blue-800 mb-2">
               Clientes
             </h2>
             <p className="text-gray-600">Total de clientes cadastrados: 120</p>
           </div>
- 
+
           <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
             <h2 className="text-xl font-semibold text-blue-800 mb-2">
               Funcionários
@@ -32,7 +32,7 @@ function AdminPainel() {
             <p className="text-gray-600">Equipe ativa: 8 colaboradores</p>
           </div>
         </div>
- 
+
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-blue-900 mb-6">
             Atividades Recentes

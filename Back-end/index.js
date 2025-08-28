@@ -25,6 +25,7 @@ const CadastroServico = require("./seguimento/CadastroServico");
 const clienteIdAgenda = require("./seguimento/ClienteIdAgenda");
 const clienteIdCpf = require("./seguimento/clientesIdCpf");
 const ColaboradorDispensa = require("./seguimento/ColaboradorDispensa");
+const Cadastrocolaboradore = require("./seguimento/Cadastrocolaboradore");
 
 app.post("/login", login);
 app.post("/agenda", agenda);
@@ -43,6 +44,7 @@ app.use("/AtualizaStatus", authMiddleware, AtualizaStatus);
 app.use("/Pendencias", authMiddleware, Pendencias);
 app.use("/CadastroServico", authMiddleware, CadastroServico);
 app.use("/ColaboradorDispensa", authMiddleware, ColaboradorDispensa);
+app.post("/cadastrocolaboradore", authMiddleware, Cadastrocolaboradore);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

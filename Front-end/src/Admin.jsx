@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthContext/useAuth";  
+import { useAuth } from "./AuthContext/useAuth"; 
 
 function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth();  
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +21,7 @@ function Login() {
       const data = await response.json();
 
       if (data.sucesso === true && data.token) {
-        login(data.token);  
+        login(data.token);
         navigate("/AdminPainel");
       } else {
         console.error("Erro:", data.mensagem || "Login inválido");

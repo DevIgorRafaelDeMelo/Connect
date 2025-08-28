@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import Sidebar from "../Componets/Sidebar";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; 
 
 export default function Empresa() {
   useEffect(() => {
@@ -25,7 +25,6 @@ export default function Empresa() {
           const errorData = await res.json();
           throw new Error(errorData.erro || "Erro na requisição");
         }
- 
       } catch (error) {
         console.error("Erro ao buscar empresas:", error.message);
       }
@@ -37,7 +36,7 @@ export default function Empresa() {
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] p-44">
+      <div className="flex-1 p-8 ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Painel de Gestão
         </h1>

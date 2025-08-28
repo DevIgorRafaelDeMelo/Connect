@@ -9,14 +9,16 @@ import {
   FaCircle,
   FaCrown,
 } from "react-icons/fa";
+import LoadingSpinner from "../Componets/LoadingSpinner";
 
 function ClienteId() {
   const { id } = useParams();
   const [cliente, setCliente] = useState(null);
   const [registros, setRegistros] = useState([null]);
-  const [filtroData, setFiltroData] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("");
   const [ordem, setOrdem] = useState("asc");
+  const [filtroDataInicial, setFiltroDataInicial] = useState("");
+  const [filtroDataFinal, setFiltroDataFinal] = useState("");
   const navigate = useNavigate();
 
   const nivelEstilo = {
@@ -60,8 +62,8 @@ function ClienteId() {
     };
   }, [id]);
 
-  if (!cliente) return <p>Carregando...</p>;
-  if (!registros) return <p>Carregando...</p>;
+  if (!cliente) return <LoadingSpinner texto="Buscando dados..." />;
+
   const realizados = registros.filter((item) => item.STATUS === "REALIZADO");
   const totalRealizados = realizados.length;
 
@@ -73,6 +75,22 @@ function ClienteId() {
     return 1;
   };
 
+  const registrosFiltrados = registros.filter((registro) => {
+    const dataRegistro = new Date(registro.DATA_ATENDIMENTO);
+    const dataInicial = filtroDataInicial ? new Date(filtroDataInicial) : null;
+    const dataFinal = filtroDataFinal ? new Date(filtroDataFinal) : null;
+
+    const dentroDoIntervalo =
+      (!dataInicial || dataRegistro >= dataInicial) &&
+      (!dataFinal || dataRegistro <= dataFinal);
+
+    const correspondeStatus = filtroStatus
+      ? registro.STATUS === filtroStatus
+      : true;
+
+    return dentroDoIntervalo && correspondeStatus;
+  });
+
   const nivel = getNivel(totalRealizados);
   const estilo = nivelEstilo[nivel];
   const Icon = estilo.icon;
@@ -80,7 +98,7 @@ function ClienteId() {
   return (
     <section className="flex">
       <Sidebar />
-      <div className="flex-1 w-[70vh] ms-[30vh] p-44">
+      <div className="flex-1 w-[70vh] ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Dados do Cliente
         </h1>
@@ -121,8 +139,20 @@ function ClienteId() {
             </label>
             <input
               type="date"
-              value={filtroData}
-              onChange={(e) => setFiltroData(e.target.value)}
+              value={filtroDataInicial}
+              onChange={(e) => setFiltroDataInicial(e.target.value)}
+              className="border px-2 py-1 rounded"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Data final
+            </label>
+            <input
+              type="date"
+              value={filtroDataFinal}
+              onChange={(e) => setFiltroDataFinal(e.target.value)}
               className="border px-2 py-1 rounded"
             />
           </div>
@@ -166,7 +196,7 @@ function ClienteId() {
             </tr>
           </thead>
           <tbody>
-            {registros.map((registro) => (
+            {registrosFiltrados.map((registro) => (
               <tr
                 key={registro.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"

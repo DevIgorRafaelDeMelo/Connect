@@ -4,6 +4,7 @@ import PopupConfirmacao from "../Componets/Popup";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { FaRegFileAlt } from "react-icons/fa";
+import LoadingSpinner from "../Componets/LoadingSpinner";
 
 export default function Feriados() {
   const [registro, setRegistros] = useState([]);
@@ -19,8 +20,36 @@ export default function Feriados() {
   const [filtroNome, setFiltroNome] = useState();
   const [dispensas, setDispensas] = useState();
   const [filtroNomeCadastro, setFiltroNomeCadastro] = useState("");
-
   const [showFormulario, setShowFormulario] = useState(false);
+
+  useEffect(() => {
+    if (clienteSelecionado) {
+      setNome(clienteSelecionado.NOME || "");
+    }
+
+    const fetchClientes = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token não encontrado.");
+        return;
+      }
+      try {
+        const res = await fetch(`http://localhost:5000/Colaboradores`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await res.json();
+        setRegistros(data.registros);
+        setDispensas(data.dispensas);
+      } catch (error) {
+        console.error("Erro ao buscar clientes:", error);
+      }
+    };
+
+    fetchClientes();
+  }, [clienteSelecionado, msg, mostrarPopup]);
 
   const gerarRelatorioPDF = (item) => {
     const doc = new jsPDF();
@@ -83,35 +112,6 @@ export default function Feriados() {
     doc.save(`relatorio-dispensa-${item.NOME}.pdf`);
   };
 
-  useEffect(() => {
-    if (clienteSelecionado) {
-      setNome(clienteSelecionado.NOME || "");
-    }
-
-    const fetchClientes = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.warn("Token não encontrado.");
-        return;
-      }
-      try {
-        const res = await fetch(`http://localhost:5000/Colaboradores`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await res.json();
-        setRegistros(data.registros);
-        setDispensas(data.dispensas); 
-      } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
-      }
-    };
-
-    fetchClientes();
-  }, [clienteSelecionado, msg, mostrarPopup]);
-
   const atualizarServico = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -166,10 +166,12 @@ export default function Feriados() {
         .sort((a, b) => new Date(a.DATA_INICIO) - new Date(b.DATA_INICIO))
     : [];
 
+  if (!registro) return <LoadingSpinner texto="Buscando dados..." />;
+
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 ms-[30vh] p-44">
+      <div className="flex-1 p-8 ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 mb-12">
           Cadastros Agendados
         </h1>

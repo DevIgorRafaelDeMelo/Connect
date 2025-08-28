@@ -23,6 +23,27 @@ async function getClientByIdUser(id) {
   }
 }
 
+async function getDepartamento() {
+  try {
+    const [rows] = await db.query("SELECT * FROM DEPARTAMENTO");
+    return rows;
+  } catch (error) {
+    console.error("Erro ao buscar departamentos:", error);
+    throw error;
+  }
+}
+
+async function getCargos() {
+  try {
+    const [rows] = await db.query("SELECT * FROM CARGO");
+
+    return rows;
+  } catch (error) {
+    console.error("Erro ao buscar cargos:", error);
+    throw error;
+  }
+}
+
 async function getClientsByCPF(cpf) {
   try {
     const cpfLimpo = cpf.replace(/\D/g, "");
@@ -74,7 +95,6 @@ async function getServicos() {
 async function getColaboradores() {
   try {
     const [rows] = await db.query("SELECT  * FROM funcionarios ");
-
     return rows;
   } catch (error) {
     throw error;
@@ -100,4 +120,6 @@ module.exports = {
   getClientsAgenda,
   getClientByIdUser,
   getDispensas,
+  getDepartamento,
+  getCargos,
 };

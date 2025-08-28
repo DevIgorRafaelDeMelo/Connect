@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../Componets/Sidebar";
+import LoadingSpinner from "../Componets/LoadingSpinner";
 
 function Administracao() {
   const [numero, setNumero] = useState();
@@ -39,20 +40,17 @@ function Administracao() {
 
     fetchEmpresas();
   }, []);
+  if (loading) return <LoadingSpinner texto="Buscando dados..." />;
 
   return (
     <section className="flex">
       <Sidebar />
-      <div className="flex-1 ml-[30vh] p-44">
+      <div className="flex-1 ml-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 mb-10">
           Administração
         </h1>
 
-        {loading ? (
-          <p>Carregando...</p>
-        ) : (
-          <p className="text-lg text-gray-900">Número: {numero}</p>
-        )}
+        <p className="text-lg text-gray-900">Número: {numero}</p>
       </div>
     </section>
   );

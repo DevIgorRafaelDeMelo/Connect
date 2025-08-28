@@ -11,6 +11,7 @@ import {
   FaCircle,
   FaCrown,
 } from "react-icons/fa";
+import LoadingSpinner from "../Componets/LoadingSpinner";
 
 function ClientePage() {
   const { id, cpf } = useParams();
@@ -22,27 +23,6 @@ function ClientePage() {
   const [filtroData, setFiltroData] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("");
   const [ordem, setOrdem] = useState("asc");
-  const navigate = useNavigate();
-  const registrosFiltrados = registros
-    .filter((registro) => {
-      const dataFormatada = new Date(registro.DATA_ATENDIMENTO)
-        .toISOString()
-        .split("T")[0];
-
-      const correspondeData = filtroData ? dataFormatada === filtroData : true;
-      const correspondeStatus = filtroStatus
-        ? registro.STATUS === filtroStatus
-        : true;
-
-      return correspondeData && correspondeStatus;
-    })
-    .sort((a, b) => {
-      const dataA = new Date(a.DATA_ATENDIMENTO);
-      const dataB = new Date(b.DATA_ATENDIMENTO);
-
-      return ordem === "asc" ? dataA - dataB : dataB - dataA;
-    });
-
   const nivelEstilo = {
     1: { color: "text-gray-500", label: "Prata", icon: FaCircle },
     2: { color: "text-yellow-600", label: "Ouro", icon: FaStarHalfAlt },
@@ -50,33 +30,19 @@ function ClientePage() {
     4: { color: "text-blue-500", label: "Platina", icon: FaGem },
     5: { color: "text-cyan-500", label: "Diamante", icon: FaCrown },
   };
-
-  const handleConfirmar = async (id, status) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.warn("Token não encontrado.");
-      return;
-    }
-    try {
-      const res = await fetch(`http://localhost:5000/AtualizaStatus/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ATIVO: status }),
-      });
-
-      const data = await res.json();
-
-      setMostrarPopup(true);
-      setMsg(data.message);
-    } catch (error) {
-      console.error("Erro ao atualizar status:", error);
-      setMsg("Erro ao atualizar serviço");
-      setMostrarPopup(true);
-    }
+  const realizados = registros.filter((item) => item.STATUS === "REALIZADO");
+  const totalRealizados = realizados.length;
+  const getNivel = (total) => {
+    if (total >= 100) return 5;
+    if (total >= 50) return 4;
+    if (total >= 30) return 3;
+    if (total >= 10) return 2;
+    return 1;
   };
+  const nivel = getNivel(totalRealizados);
+  const estilo = nivelEstilo[nivel];
+  const Icon = estilo.icon;
+  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
@@ -113,27 +79,59 @@ function ClientePage() {
     };
   }, [id, msg, cliente, registros, cpf]);
 
-  if (!cliente) return <p>Carregando...</p>;
+  const registrosFiltrados = registros
+    .filter((registro) => {
+      const dataFormatada = new Date(registro.DATA_ATENDIMENTO)
+        .toISOString()
+        .split("T")[0];
 
-  const realizados = registros.filter((item) => item.STATUS === "REALIZADO");
-  const totalRealizados = realizados.length;
+      const correspondeData = filtroData ? dataFormatada === filtroData : true;
+      const correspondeStatus = filtroStatus
+        ? registro.STATUS === filtroStatus
+        : true;
 
-  const getNivel = (total) => {
-    if (total >= 100) return 5;
-    if (total >= 50) return 4;
-    if (total >= 30) return 3;
-    if (total >= 10) return 2;
-    return 1;
+      return correspondeData && correspondeStatus;
+    })
+    .sort((a, b) => {
+      const dataA = new Date(a.DATA_ATENDIMENTO);
+      const dataB = new Date(b.DATA_ATENDIMENTO);
+
+      return ordem === "asc" ? dataA - dataB : dataB - dataA;
+    });
+
+  const handleConfirmar = async (id, status) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/AtualizaStatus/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ATIVO: status }),
+      });
+
+      const data = await res.json();
+
+      setMostrarPopup(true);
+      setMsg(data.message);
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+      setMsg("Erro ao atualizar serviço");
+      setMostrarPopup(true);
+    }
   };
 
-  const nivel = getNivel(totalRealizados);
-  const estilo = nivelEstilo[nivel];
-  const Icon = estilo.icon;
+  if (!cliente) return <LoadingSpinner texto="Buscando dados..." />;
 
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 w-[70vh] ms-[30vh] p-40">
+      <div className="flex-1 w-[70vh] ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Dados do Cliente
         </h1>

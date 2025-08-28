@@ -1,6 +1,7 @@
 import Sidebar from "../Componets/Sidebar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import LoadingSpinner from "../Componets/LoadingSpinner";
 
 function Clientes() {
   const [clientes, setClientes] = useState([]);
@@ -32,6 +33,8 @@ function Clientes() {
     fetchClientes();
   }, []);
 
+  if (!clientes) return <LoadingSpinner texto="Buscando dados..." />;
+
   const clientesFiltrados = clientes
     .filter((cliente) =>
       cliente.CLIENTE_NOME.toLowerCase().includes(busca.toLowerCase())
@@ -41,17 +44,22 @@ function Clientes() {
   return (
     <section className="flex ">
       <Sidebar />
-      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-44">
+      <div className="flex-1 p-8 w-[70vh] ms-[30vh] p-32">
         <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-10">
           Clientes
         </h1>
-        <input
-          type="text"
-          placeholder="Pesquisar por nome..."
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Nome
+          </label>
+          <input
+            type="text"
+            placeholder="Pesquisar por nome..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
         <table className="min-w-full divide-y divide-blue-100">
           <thead className="bg-blue-50">

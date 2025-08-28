@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Adicione isso no seu CSS global */
+ 
 @keyframes slide-in {
   from {
     transform: translateX(100%);

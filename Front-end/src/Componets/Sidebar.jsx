@@ -126,6 +126,9 @@ function Sidebar() {
           <span className="font-medium">Empresa</span>
         </NavLink>
       </nav>
+      <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-blue-200">
+        <span className="font-semibold">Connect V 1.2 27.8.25 </span>
+      </div>
     </aside>
   );
 }
