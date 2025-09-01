@@ -2,20 +2,21 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import Admin from "./Admin";
 import AdminPainel from "./AdminPainel";
-import Dashbord from "./Pages/Dashbord.JSX";
+import Dashbord from "./Pages/Agenda/Dashbord.JSX";
 import { Navigate } from "react-router-dom";
-import Agendamentos from "./Pages/Agendamentos";
-import ClientePage from "./Pages/ClientePage";
-import Clientes from "./Pages/Clientes";
-import Empresa from "./Pages/Empresa";
-import Servicos from "./Pages/Servicos";
-import Colaboradores from "./Pages/Colaboradores";
-import ClientePageDados from "./Pages/ClienteDados";
-import ClienteId from "./Pages/ClienteId";
-import Pendencias from "./Pages/Pendencias";
-import Agendar from "./Pages/Agendar";
-import Administracao from "./Pages/Administracao";
-import Feriados from "./Pages/Feriados";
+import Agendamentos from "./Pages/Agenda/Agendamentos";
+import ClientePage from "./Pages/Agenda/ClientePage";
+import Clientes from "./Pages/Agenda/Clientes";
+import Empresa from "./Pages/Agenda/Empresa";
+import Servicos from "./Pages/Agenda/Servicos";
+import Colaboradores from "./Pages/Agenda/Colaboradores";
+import ClientePageDados from "./Pages/Agenda/ClienteDados";
+import ClienteId from "./Pages/Agenda/ClienteId";
+import Pendencias from "./Pages/Agenda/Pendencias";
+import Agendar from "./Pages/Agenda/Agendar";
+import Administracao from "./Pages/Agenda/Administracao";
+import Feriados from "./Pages/Agenda/Feriados";
+import Contas from "./Pages/Financeiro/Contas";
 import { useAuth } from "./AuthContext/useAuth";
 
 function App() {
@@ -135,7 +136,14 @@ function App() {
             <Feriados />
           </RotaProtegida>
         }
-        feriados
+      />
+      <Route
+        path="/contas"
+        element={
+          <RotaProtegida>
+            <Contas />
+          </RotaProtegida>
+        }
       />
     </Routes>
   );

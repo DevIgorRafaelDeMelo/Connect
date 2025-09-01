@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Sidebar from "../Componets/Sidebar";
-import PopupConfirmacao from "../Componets/Popup";
+import Sidebar from "../../Componets/Sidebar";
+import PopupConfirmacao from "../../Componets/Popup";
 import { FaCog } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,7 +11,7 @@ import {
   FaCircle,
   FaCrown,
 } from "react-icons/fa";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 function ClientePage() {
   const { id, cpf } = useParams();

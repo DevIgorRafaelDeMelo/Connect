@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../Componets/Sidebar";
-import PopupConfirmacao from "../Componets/Popup";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import Sidebar from "../../Componets/Sidebar";
+import PopupConfirmacao from "../../Componets/Popup";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 export default function Servicos() {
   const [registro, setRegistros] = useState([]);

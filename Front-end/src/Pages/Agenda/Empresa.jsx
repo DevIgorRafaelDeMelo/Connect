@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Sidebar from "../Componets/Sidebar";
+import Sidebar from "../../Componets/Sidebar";
 import { Link } from "react-router-dom"; 
 
 export default function Empresa() {

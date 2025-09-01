@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../Componets/Sidebar";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import Sidebar from "../../Componets/Sidebar";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 function Administracao() {
   const [numero, setNumero] = useState();

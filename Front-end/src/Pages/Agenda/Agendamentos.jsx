@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,7 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import Sidebar from "../Componets/Sidebar";
+import Sidebar from "../../Componets/Sidebar";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 

@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Sidebar from "../Componets/Sidebar";
+import Sidebar from "../../Componets/Sidebar";
 import {
   FaGem,
   FaStarHalfAlt,
@@ -9,7 +9,7 @@ import {
   FaCrown,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 function ClientePageDados() {
   const navigate = useNavigate();

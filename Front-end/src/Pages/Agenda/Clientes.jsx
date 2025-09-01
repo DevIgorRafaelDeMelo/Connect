@@ -1,7 +1,7 @@
-import Sidebar from "../Componets/Sidebar";
+import Sidebar from "../../Componets/Sidebar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 function Clientes() {
   const [clientes, setClientes] = useState([]);

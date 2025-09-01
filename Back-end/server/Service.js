@@ -111,6 +111,16 @@ async function getDispensas() {
   }
 }
 
+async function getContas() {
+  try {
+    const [rows] = await db.query("SELECT  * FROM contas ");
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getClientByID,
   getClientsByCPF,
@@ -122,4 +132,5 @@ module.exports = {
   getDispensas,
   getDepartamento,
   getCargos,
+  getContas,
 };

@@ -1,4 +1,4 @@
-const db = require("../server/db");
+const db = require("../server/Service");
 
 const CadastroServico = async (req, res) => {
   const { descricao, valor, horarios, ativo } = req.body;

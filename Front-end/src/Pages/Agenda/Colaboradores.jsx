@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../Componets/Sidebar";
-import PopupConfirmacao from "../Componets/Popup";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import Sidebar from "../../Componets/Sidebar";
+import PopupConfirmacao from "../../Componets/Popup";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 export default function Colaboradores() {
   const [registro, setRegistros] = useState([]);
@@ -21,6 +21,7 @@ export default function Colaboradores() {
   const [departamentoCadastro, setDepartamentoCadastro] = useState();
   const [cpf, setCpf] = useState("");
   const [filtroNome, setFiltroNome] = useState("");
+  const [erros, setErros] = useState({});
 
   useEffect(() => {
     if (clienteSelecionado) {
@@ -57,6 +58,21 @@ export default function Colaboradores() {
     r.NOME.toLowerCase().includes(filtroNome.toLowerCase())
   );
 
+  const validarCampos = () => {
+    const novosErros = {};
+
+    if (!nome.trim()) novosErros.nome = "Nome é obrigatório";
+    if (!cpf.trim()) novosErros.cpf = "CPF é obrigatório";
+    if (!telefone.trim()) novosErros.telefone = "Telefone é obrigatório";
+    if (!email.trim()) novosErros.email = "E-mail é obrigatório";
+    if (!cargo) novosErros.cargo = "Cargo é obrigatório";
+    if (!departamento) novosErros.departamento = "Departamento é obrigatório";
+    if (!dataInicio) novosErros.dataInicio = "Data de início é obrigatória";
+
+    setErros(novosErros);
+    return Object.keys(novosErros).length === 0;
+  };
+
   const atualizarServico = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -64,6 +80,9 @@ export default function Colaboradores() {
       console.warn("Token não encontrado.");
       return;
     }
+
+    if (!validarCampos()) return;
+
     try {
       const response = await fetch(
         `http://localhost:5000/ColaboradorId/${clienteSelecionado.ID}`,
@@ -78,6 +97,13 @@ export default function Colaboradores() {
             CARGO: cargo,
             ATIVO: ativo,
             EXPEDIENTE: expediente,
+            CPF: cpf,
+            TELEFONE: telefone,
+            EMAIL: email,
+            CARGO_ID: cargo,
+            DEPARTAMENTO_ID: departamento,
+            DATA_INICIO: dataInicio,
+            OBSERVACOES: observacoes,
           }),
         }
       );
@@ -134,6 +160,16 @@ export default function Colaboradores() {
       const data = await response.json();
       setMostrarPopup(true);
       setMsg(data.message || "Colaborador cadastrado com sucesso!");
+      setClienteSelecionado(null);
+      setNome("");
+      setCpf("");
+      setTelefone("");
+      setEmail("");
+      setCargo("");
+      setDepartamento("");
+      setDataInicio("");
+      setObservacoes("");
+      setExpediente({});
     } catch (error) {
       console.error("Erro ao cadastrar colaborador:", error);
       alert("Erro ao cadastrar colaborador");
@@ -163,12 +199,38 @@ export default function Colaboradores() {
     }, {})
   );
 
+  const expedientePadrao = diasSemana.reduce((acc, dia) => {
+    acc[dia.key] = {
+      ativo: false,
+      inicio: "",
+      pausaInicio: "",
+      pausaFim: "",
+      fim: "",
+    };
+    return acc;
+  }, {});
+
+  const preencherExpediente = (expedienteDoRegistro) => {
+    const novoExpediente = { ...expedientePadrao };
+
+    for (const key in expedienteDoRegistro) {
+      if (novoExpediente[key]) {
+        novoExpediente[key] = {
+          ...novoExpediente[key],
+          ...expedienteDoRegistro[key],
+        };
+      }
+    }
+
+    setExpediente(novoExpediente);
+  };
+
   const atualizarDia = (key, campo, valor) => {
     setExpediente((prev) => ({
       ...prev,
       [key]: {
         ...prev[key],
-        [campo]: campo === "ativo" ? valor : valor,
+        [campo]: valor,
       },
     }));
   };
@@ -190,14 +252,18 @@ export default function Colaboradores() {
             Cadastrar Serviço
           </button>
         </div>
-
-        <input
-          type="text"
-          placeholder="Filtrar por nome"
-          value={filtroNome}
-          onChange={(e) => setFiltroNome(e.target.value)}
-          className="mb-4 px-3 py-2 border rounded"
-        />
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Nome
+          </label>
+          <input
+            type="text"
+            placeholder="Filtrar por nome"
+            value={filtroNome}
+            onChange={(e) => setFiltroNome(e.target.value)}
+            className="mb-4 px-3 py-2 border rounded"
+          />
+        </div>
 
         <table className="min-w-full divide-y divide-blue-100">
           <thead className="bg-blue-50">
@@ -218,7 +284,18 @@ export default function Colaboradores() {
               <tr
                 key={Registro.ID}
                 className="border-b hover:bg-blue-50 cursor-pointer"
-                onClick={() => setClienteSelecionado(Registro)}
+                onClick={() => {
+                  setClienteSelecionado(Registro);
+                  setNome(Registro.NOME || "");
+                  setCpf(Registro.CPF || "");
+                  setTelefone(Registro.TELEFONE || "");
+                  setEmail(Registro.EMAIL || "");
+                  setCargo(Registro.CARGO_ID || "");
+                  setDepartamento(Registro.DEPARTAMENTO_ID || "");
+                  setDataInicio(Registro.DATA_INICIO || "");
+                  setObservacoes(Registro.OBSERVACOES || "");
+                  preencherExpediente(Registro.EXPEDIENTE || {});
+                }}
               >
                 <td className="px-4 py-2">{Registro.NOME}</td>
                 <td className="px-4 py-2">{Registro.CARGO}</td>
@@ -264,6 +341,9 @@ export default function Colaboradores() {
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
               />
+              {erros.nome && (
+                <p className="text-red-500 text-sm mt-1">{erros.nome}</p>
+              )}
             </div>
 
             <div className="mb-4">
@@ -382,7 +462,7 @@ export default function Colaboradores() {
                         </label>
                         <input
                           type="time"
-                          value={expediente[key].inicio}
+                          value={expediente[key]?.inicio || ""}
                           onChange={(e) =>
                             atualizarDia(key, "inicio", e.target.value)
                           }

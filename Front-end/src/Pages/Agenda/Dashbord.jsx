@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import InfoCard from "../Componets/InfoCard";
-import Sidebar from "../Componets/Sidebar";
+import InfoCard from "../../Componets/InfoCard";
+import Sidebar from "../../Componets/Sidebar";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -19,7 +19,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 function Dashbord() {
   const [agendamentos, setAgendamentos] = useState([]);

@@ -4,17 +4,52 @@ const db = require("../server/db");
 
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-  const { NOME, CARGO, ATIVO, EXPEDIENTE } = req.body;
-
+  
+  const {
+    NOME,
+    CARGO,
+    ATIVO,
+    EXPEDIENTE,
+    CPF,
+    TELEFONE,
+    EMAIL,
+    CARGO_ID,
+    DEPARTAMENTO_ID,
+    DATA_INICIO,
+    OBSERVACOES,
+  } = req.body;
+  console.log("oi")
   try {
     const queryFuncionario = `
       UPDATE FUNCIONARIOS
-      SET NOME = ?, CARGO = ?, STATUS = ?
+      SET
+        NOME = ?,
+        CARGO = ?,
+        STATUS = ?,
+        CPF = ?,
+        TELEFONE = ?,
+        EMAIL = ?,
+        CARGO_ID = ?,
+        DEPARTAMENTO_ID = ?,
+        DATA_INICIO = ?,
+        OBSERVACOES = ?
       WHERE ID = ?
     `;
-    await db.execute(queryFuncionario, [NOME, CARGO, ATIVO, id]);
+    await db.execute(queryFuncionario, [
+      NOME,
+      CARGO,
+      ATIVO,
+      CPF,
+      TELEFONE,
+      EMAIL,
+      CARGO_ID,
+      DEPARTAMENTO_ID,
+      DATA_INICIO,
+      OBSERVACOES,
+      id,
+    ]);
 
-    const dias = Object.entries(EXPEDIENTE).filter(([_, dados]) => dados.ativo);
+    const dias = Object.entries(EXPEDIENTE);
 
     for (const [dia, dados] of dias) {
       const { ativo, inicio, pausaInicio, pausaFim, fim } = dados;

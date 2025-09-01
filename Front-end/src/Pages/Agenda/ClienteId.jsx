@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Sidebar from "../Componets/Sidebar";
+import Sidebar from "../../Componets/Sidebar";
 import { useNavigate } from "react-router-dom";
 import {
   FaGem,
@@ -9,7 +9,7 @@ import {
   FaCircle,
   FaCrown,
 } from "react-icons/fa";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 function ClienteId() {
   const { id } = useParams();

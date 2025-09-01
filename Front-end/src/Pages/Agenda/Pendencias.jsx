@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import PopupConfirmacao from "../Componets/Popup";
-import Sidebar from "../Componets/Sidebar";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import PopupConfirmacao from "../../Componets/Popup";
+import Sidebar from "../../Componets/Sidebar";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 export default function Empresa() {
   const [pendencias, setPendencias] = useState([]);

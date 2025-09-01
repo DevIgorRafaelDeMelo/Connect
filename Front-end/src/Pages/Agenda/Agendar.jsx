@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../Componets/Sidebar";
-import CalendarCard from "../Componets/CalendarCard";
-import { getMonthDays } from "../../utils/getMonthDays";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import Sidebar from "../../Componets/Sidebar";
+import CalendarCard from "../../Componets/CalendarCard";
+import { getMonthDays } from "../../../utils/getMonthDays";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 function Agendar() {
   const [agenda, setAgenda] = useState([]);

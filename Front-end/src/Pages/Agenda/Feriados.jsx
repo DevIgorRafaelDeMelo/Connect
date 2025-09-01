@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../Componets/Sidebar";
-import PopupConfirmacao from "../Componets/Popup";
+import Sidebar from "../../Componets/Sidebar";
+import PopupConfirmacao from "../../Componets/Popup";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { FaRegFileAlt } from "react-icons/fa";
-import LoadingSpinner from "../Componets/LoadingSpinner";
+import LoadingSpinner from "../../Componets/LoadingSpinner";
 
 export default function Feriados() {
   const [registro, setRegistros] = useState([]);
