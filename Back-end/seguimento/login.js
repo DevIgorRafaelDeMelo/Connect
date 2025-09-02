@@ -3,8 +3,7 @@ const db = require("../server/db");
 
 const SEGREDO = process.env.JWT_SECRET || "sua_chave_secreta";
 
-const login = async (req, res) => {
-  console.log("oi")
+const login = async (req, res) => { 
   const { email, senha } = req.body;
 
   try {

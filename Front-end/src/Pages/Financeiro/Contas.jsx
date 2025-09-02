@@ -64,10 +64,8 @@ function ContasPage() {
           },
         });
         const data = await res.json();
-        console.log(data);
         setContas(data.contas);
         setClientes(data.Cadastros);
-        console.log(contas, clientes);
       } catch (error) {
         console.error("Erro ao buscar clientes:", error);
       }

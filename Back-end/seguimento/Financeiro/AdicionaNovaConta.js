@@ -19,6 +19,7 @@ router.put("/", async (req, res) => {
       TIPO,
       ID_DEVEDOR,
     } = req.body;
+
     const multaDecimal = parseFloat(MULTA || 0).toFixed(2);
     const jurosDecimal = parseFloat(JUROS || 0).toFixed(2);
     const descontoDecimal = parseFloat(DESCONTO || 0).toFixed(2);
@@ -37,31 +38,30 @@ router.put("/", async (req, res) => {
 
     const query = `
   INSERT INTO contas (
-    TIPO, NOME,
+    TIPO, NOME,  
     VALOR_TOTAL, VALOR_PAGO, MULTA, JUROS,
     DESCONTO, NUMERO_PARCELAS, VENCIMENTO, ID_DEVEDOR,
     CRIADA_EM, ATUALIZADA_EM, STATUS
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
     const values = [
-      TIPO || "", // TIPO
-      NOME || "", // NOME (corrigido!)
-      valorTotal, // VALOR_TOTAL
-      VALOR_PAGO || 0, // VALOR_PAGO
-      multaDecimal || 0, // MULTA
-      jurosDecimal || 0, // JUROS
-      descontoDecimal || 0, // DESCONTO
-      parcelas, // NUMERO_PARCELAS
-      VENCIMENTO, // VENCIMENTO
-      ID_DEVEDOR, // ID_DEVEDOR
-      now, // CRIADA_EM
-      now, // ATUALIZADA_EM
-      "PENDENTE", // STATUS
+      TIPO || "",
+      DESCRICAO || "",
+      valorTotal,
+      VALOR_PAGO || 0,
+      multaDecimal || 0,
+      jurosDecimal || 0,
+      descontoDecimal || 0,
+      parcelas,
+      VENCIMENTO,
+      ID_DEVEDOR,
+      now,
+      now,
+      "PENDENTE",
     ];
 
     const [result] = await db.execute(query, values);
-    console.log(result);
 
     res.status(201).json({ mensagem: "Conta adicionada com sucesso." });
   } catch (error) {
