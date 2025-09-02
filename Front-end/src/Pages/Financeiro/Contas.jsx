@@ -22,6 +22,8 @@ function ContasPage() {
     TIPO: "",
     ID_DEVEDOR: "",
   });
+  const [contaSelecionada, setContaSelecionada] = useState(null);
+  const [modalAberto, setModalAberto] = useState(false);
   const TIPOS_DE_DIVIDAS = [
     "Médico",
     "Condomínio",
@@ -49,6 +51,11 @@ function ContasPage() {
     setMostrarFormulario(true);
   };
 
+  const abrirModal = (conta) => {
+    setContaSelecionada(conta);
+    setModalAberto(true);
+  };
+
   useEffect(() => {
     const fetchClientes = async () => {
       const token = localStorage.getItem("token");
@@ -66,6 +73,7 @@ function ContasPage() {
         const data = await res.json();
         setContas(data.contas);
         setClientes(data.Cadastros);
+        console.log(contas);
       } catch (error) {
         console.error("Erro ao buscar clientes:", error);
       }
@@ -229,37 +237,40 @@ function ContasPage() {
           </table>
           <table className="min-w-full divide-y divide-blue-100">
             <tbody>
-              {contasFiltradas.map((conta) => (
-                <tr
-                  key={conta.ID}
-                  className="border-b hover:bg-blue-50 cursor-pointer"
-                >
-                  <td className="px-6 py-4">{conta.CLIENTE_NOME}</td>
-                  <td className="px-6 py-4">{conta.NOME}</td>
-                  <td className="px-6 py-4">
-                    R${" "}
-                    {(
-                      parseFloat(conta.VALOR_TOTAL) /
-                      parseInt(conta.NUMERO_PARCELAS)
-                    ).toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4">{conta.NUMERO_PARCELAS}</td>
-                  <td className="px-6 py-4">
-                    {new Date(conta.VENCIMENTO).toLocaleDateString("pt-BR")}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        conta.STATUS === "PAGO"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {conta.STATUS}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {contasFiltradas
+                .sort((a, b) => new Date(b.CRIADA_EM) - new Date(a.CRIADA_EM))
+                .map((conta) => (
+                  <tr
+                    key={conta.ID}
+                    className="border-b hover:bg-blue-50 cursor-pointer"
+                    onClick={() => abrirModal(conta)}
+                  >
+                    <td className="px-6 py-4">{conta.CLIENTE_NOME}</td>
+                    <td className="px-6 py-4">{conta.NOME}</td>
+                    <td className="px-6 py-4">
+                      R${" "}
+                      {(
+                        parseFloat(conta.VALOR_TOTAL) /
+                        parseInt(conta.NUMERO_PARCELAS)
+                      ).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4">{conta.NUMERO_PARCELAS}</td>
+                    <td className="px-6 py-4">
+                      {new Date(conta.VENCIMENTO).toLocaleDateString("pt-BR")}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          conta.STATUS === "PAGO"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {conta.STATUS}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -399,6 +410,73 @@ function ContasPage() {
             >
               Salvar
             </button>
+          </div>
+        </div>
+      )}
+      {modalAberto && contaSelecionada && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-end">
+          <div className="h-full w-[80%] max-w-xl bg-white shadow-2xl border-l border-gray-300 p-8 overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                📄 Detalhes da Conta
+              </h2>
+              <button
+                className="text-gray-500 hover:text-red-600 text-xl font-bold"
+                onClick={() => setModalAberto(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4 text-gray-700">
+              <div>
+                <span className="font-semibold">👤 Cliente:</span>{" "}
+                {contaSelecionada.CLIENTE_NOME}
+              </div>
+              <div>
+                <span className="font-semibold">📌 Nome:</span>{" "}
+                {contaSelecionada.NOME}
+              </div>
+              <div>
+                <span className="font-semibold">📝 Descrição:</span>{" "}
+                {contaSelecionada.DESCRICAO}
+              </div>
+              <div>
+                <span className="font-semibold">💰 Valor Total:</span> R${" "}
+                {parseFloat(contaSelecionada.VALOR_TOTAL).toFixed(2)}
+              </div>
+              <div>
+                <span className="font-semibold">📆 Parcelas:</span>{" "}
+                {contaSelecionada.NUMERO_PARCELAS}
+              </div>
+              <div>
+                <span className="font-semibold">📅 Vencimento:</span>{" "}
+                {new Date(contaSelecionada.VENCIMENTO).toLocaleDateString(
+                  "pt-BR"
+                )}
+              </div>
+              <div>
+                <span className="font-semibold">🔖 Status:</span>{" "}
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    contaSelecionada.STATUS === "PAGO"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
+                  {contaSelecionada.STATUS}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-end">
+              <button
+                className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                onClick={() => setModalAberto(false)}
+              >
+                Fechar
+              </button>
+            </div>
           </div>
         </div>
       )}
