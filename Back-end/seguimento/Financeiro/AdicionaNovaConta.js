@@ -61,9 +61,37 @@ router.put("/", async (req, res) => {
       "PENDENTE",
     ];
 
-    const [result] = await db.execute(query, values);
+    const [resultConta] = await db.execute(query, values);
+    const contaId = resultConta.insertId;
 
-    res.status(201).json({ mensagem: "Conta adicionada com sucesso." });
+    const valorParcela = parseFloat((valorTotal / parcelas).toFixed(2));
+    const vencimentoInicial = new Date(VENCIMENTO);
+
+    for (let i = 0; i < parcelas; i++) {
+      const vencimentoParcela = new Date(vencimentoInicial);
+      vencimentoParcela.setMonth(vencimentoParcela.getMonth() + i);
+
+      const queryParcela = `
+        INSERT INTO parcelas (
+          ID_CONTA, NUMERO_PARCELA, VALOR, VENCIMENTO, STATUS, CRIADA_EM
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `;
+
+      const valuesParcela = [
+        contaId,
+        i + 1,
+        valorParcela,
+        vencimentoParcela.toISOString().slice(0, 10),
+        "PENDENTE",
+        now,
+      ];
+
+      await db.execute(queryParcela, valuesParcela);
+    }
+
+    res
+      .status(201)
+      .json({ mensagem: "Conta e parcelas adicionadas com sucesso." });
   } catch (error) {
     console.error("Erro ao adicionar conta:", error);
     res.status(500).json({ erro: "Erro interno do servidor." });
