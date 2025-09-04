@@ -30,6 +30,7 @@ const Contas = require("./seguimento/Financeiro/Contas");
 const AdicionaNovaConta = require("./seguimento/Financeiro/AdicionaNovaConta");
 const BuscarConta = require("./seguimento/Financeiro/BuscarConta");
 const DeleteConta = require("./seguimento/Financeiro/DeleteConta");
+const QuitarConta = require("./seguimento/Financeiro/QuitarConta");
 
 app.post("/login", login);
 app.post("/agenda", agenda);
@@ -53,6 +54,7 @@ app.use("/Contas", authMiddleware, Contas);
 app.use("/adicionaNovaConta", authMiddleware, AdicionaNovaConta);
 app.use("/BuscarConta", authMiddleware, BuscarConta);
 app.use("/DeleteConta", authMiddleware, DeleteConta);
+app.use("/QuitarConta", authMiddleware, QuitarConta);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

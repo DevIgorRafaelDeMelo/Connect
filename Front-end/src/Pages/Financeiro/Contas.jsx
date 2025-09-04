@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../Componets/Sidebar";
+import { FaCog } from "react-icons/fa";
 
 function ContasPage() {
   const [contas, setContas] = useState([]);
@@ -11,6 +12,8 @@ function ContasPage() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [parcelas, setParcelas] = useState();
   const [modalExcluirAberto, setModalExcluirAberto] = useState(false);
+  const [modalQuitarAberto, setModalQuitarAberto] = useState(false);
+  const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
   const [novaConta, setNovaConta] = useState({
     CLIENTE_NOME: "",
     DESCRICAO: "",
@@ -59,12 +62,6 @@ function ContasPage() {
   };
 
   useEffect(() => {
-    if (mostrarFormulario) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
     const fetchClientes = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -86,7 +83,7 @@ function ContasPage() {
       }
     };
     fetchClientes();
-  }, [mostrarFormulario]);
+  }, [contas, modalQuitarAberto, modalExcluirAberto]);
   const contasComCliente = contas.map((conta) => {
     const cliente = clientes.find((c) => c.ID === conta.ID_DEVEDOR);
     return {
@@ -188,8 +185,33 @@ function ContasPage() {
       alert("Não foi possível excluir a conta.");
     }
   };
+
+  const quitarConta = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
+    try {
+      const res = await fetch("http://localhost:5000/QuitarConta", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+      const dados = await res.json();
+
+      console.log(dados.mensagem);
+    } catch (erro) {
+      console.error("Erro ao excluir conta:", erro);
+      alert("Não foi possível excluir a conta.");
+    }
+  };
+
   return (
-    <div className="min-h-screen flex overflow-hidden">
+    <div className="h-screen flex  ">
       <Sidebar />
 
       <div className="flex-1  ms-[30vh]  mx-auto p-32  ">
@@ -230,7 +252,7 @@ function ContasPage() {
               className="border px-3 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Todos os status</option>
-              <option value="PAGO">Pago</option>
+              <option value="PAGA">Pago</option>
               <option value="PENDENTE">Pendente</option>
             </select>
           </div>
@@ -259,7 +281,7 @@ function ContasPage() {
             />
           </div>
         </div>
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-white shadow-md rounded-lg  ">
           <table className="min-w-full table-auto">
             <thead className="bg-blue-700 text-white">
               <tr>
@@ -333,7 +355,7 @@ function ContasPage() {
         </div>
       </div>
       {mostrarFormulario && (
-        <div className="fixed top-0 right-0 z-50 h-screen w-[85%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-24 ">
+        <div className="fixed top-0 right-0 z-50 h-screen w-[80%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-24 ">
           <div className="   px-6 py-4 flex justify-between items-center">
             <h2 className="text-xl font-bold text-blue-700">Nova Conta</h2>
             <div className="flex justify-end mt-4">
@@ -377,15 +399,33 @@ function ContasPage() {
                 ))}
               </datalist>
             </div>
+            <select
+              value={novaConta.TIPO}
+              onChange={(e) =>
+                setNovaConta({ ...novaConta, TIPO: e.target.value })
+              }
+              className="border px-3 py-2 rounded"
+            >
+              <option value="">Selecione o tipo</option>
+              <option value="RECEBER">Conta a Receber</option>
+              <option value="PAGAR">Conta a Pagar</option>
+            </select>
             <input
               type="text"
-              placeholder="Descrição"
+              list="tipos-de-dividas"
+              placeholder="Tipo"
               value={novaConta.DESCRICAO}
               onChange={(e) =>
                 setNovaConta({ ...novaConta, DESCRICAO: e.target.value })
               }
               className="border px-3 py-2 rounded"
             />
+
+            <datalist id="tipos-de-dividas">
+              {TIPOS_DE_DIVIDAS.map((tipo, index) => (
+                <option key={index} value={tipo} />
+              ))}
+            </datalist>
             <input
               type="number"
               placeholder="Valor Total"
@@ -442,22 +482,6 @@ function ContasPage() {
               }
               className="border px-3 py-2 rounded"
             />
-            <input
-              type="text"
-              list="tipos-de-dividas"
-              placeholder="Tipo"
-              value={novaConta.TIPO}
-              onChange={(e) =>
-                setNovaConta({ ...novaConta, TIPO: e.target.value })
-              }
-              className="border px-3 py-2 rounded"
-            />
-
-            <datalist id="tipos-de-dividas">
-              {TIPOS_DE_DIVIDAS.map((tipo, index) => (
-                <option key={index} value={tipo} />
-              ))}
-            </datalist>
           </div>
 
           <div className="flex justify-end mt-4 gap-2">
@@ -471,7 +495,7 @@ function ContasPage() {
         </div>
       )}
       {modalAberto && contaSelecionada && (
-        <div className="fixed top-0 right-0 z-50 h-screen w-[85%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-24 ">
+        <div className="fixed top-0 right-0 z-50 h-screen w-[80%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-40 overflow-y-auto">
           <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 ">
             Detalhes da Conta
           </h1>
@@ -484,12 +508,31 @@ function ContasPage() {
               Voltar
             </button>
 
-            <button
-              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-              onClick={() => setModalExcluirAberto(true)}
-            >
-              Excluir Conta
-            </button>
+            <div className="relative inline-block text-left">
+              <button
+                className="p-2 rounded-full hover:bg-gray-200 transition"
+                onClick={() => setMostrarOpcoes(!mostrarOpcoes)}
+              >
+                <FaCog className="h-6 w-6 text-gray-700" />
+              </button>
+
+              {mostrarOpcoes && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
+                  <button
+                    className="w-full text-left px-4 py-2  hover:bg-blue-100"
+                    onClick={() => setModalExcluirAberto(true)}
+                  >
+                    Excluir Conta
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2  hover:bg-blue-100"
+                    onClick={() => setModalQuitarAberto(true)}
+                  >
+                    Quitar Conta
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-gray-700 text-base">
             <div>
@@ -540,7 +583,7 @@ function ContasPage() {
             <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
               Parcelas
             </h1>
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="bg-white shadow-md rounded-lg ">
               <table className="min-w-full divide-y divide-blue-100 table-auto text-sm text-left">
                 <thead className="bg-blue-700 text-white">
                   <tr>
@@ -618,6 +661,38 @@ function ContasPage() {
                 onClick={() => {
                   excluirConta(contaSelecionada.ID);
                   setModalExcluirAberto(false);
+                  setModalAberto(false);
+                }}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {modalQuitarAberto && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+            <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 ">
+              Confirmar Quitação
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Tem certeza que deseja Quitar todas as dividas da conta{" "}
+              <strong>{contaSelecionada.NOME}</strong>? Essa ação não poderá ser
+              desfeita.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                onClick={() => setModalQuitarAberto(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                onClick={() => {
+                  quitarConta(contaSelecionada.ID);
+                  setModalQuitarAberto(false);
                   setModalAberto(false);
                 }}
               >

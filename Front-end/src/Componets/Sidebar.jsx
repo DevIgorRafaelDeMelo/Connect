@@ -28,7 +28,6 @@ function Sidebar() {
     <aside className="w-[30vh] bg-gradient-to-b from-blue-900 to-blue-700 text-white p-6 shadow-lg fixed top-0 h-full overflow-y-auto">
       <img src={Logo} alt="Logo" className="h-36 m-auto mb-6" />
 
-      {/* Botões principais */}
       <nav className="space-y-3">
         <button
           onClick={() => toggleMenu("financeiro")}
