@@ -121,6 +121,18 @@ async function getContas() {
   }
 }
 
+async function getParcelas(id) {
+  try {
+    const [rows] = await db.query("SELECT * FROM parcelas WHERE ID_CONTA = ?", [
+      id,
+    ]);
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getClientByID,
   getClientsByCPF,
@@ -133,4 +145,5 @@ module.exports = {
   getDepartamento,
   getCargos,
   getContas,
+  getParcelas,
 };

@@ -28,7 +28,9 @@ const ColaboradorDispensa = require("./seguimento/ColaboradorDispensa");
 const Cadastrocolaboradore = require("./seguimento/Cadastrocolaboradore");
 const Contas = require("./seguimento/Financeiro/Contas");
 const AdicionaNovaConta = require("./seguimento/Financeiro/AdicionaNovaConta");
-app.use("/adicionaNovaConta", authMiddleware, AdicionaNovaConta);
+const BuscarConta = require("./seguimento/Financeiro/BuscarConta");
+const DeleteConta = require("./seguimento/Financeiro/DeleteConta");
+
 app.post("/login", login);
 app.post("/agenda", agenda);
 app.post("/comfirmagendamento", comfirmagendamento);
@@ -48,7 +50,9 @@ app.use("/CadastroServico", authMiddleware, CadastroServico);
 app.use("/ColaboradorDispensa", authMiddleware, ColaboradorDispensa);
 app.post("/cadastrocolaboradore", authMiddleware, Cadastrocolaboradore);
 app.use("/Contas", authMiddleware, Contas);
-
+app.use("/adicionaNovaConta", authMiddleware, AdicionaNovaConta);
+app.use("/BuscarConta", authMiddleware, BuscarConta);
+app.use("/DeleteConta", authMiddleware, DeleteConta);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

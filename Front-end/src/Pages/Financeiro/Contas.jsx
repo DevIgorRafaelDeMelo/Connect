@@ -9,6 +9,8 @@ function ContasPage() {
   const [filtroDataInicio, setFiltroDataInicio] = useState("");
   const [filtroDataFim, setFiltroDataFim] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [parcelas, setParcelas] = useState();
+  const [modalExcluirAberto, setModalExcluirAberto] = useState(false);
   const [novaConta, setNovaConta] = useState({
     CLIENTE_NOME: "",
     DESCRICAO: "",
@@ -57,6 +59,12 @@ function ContasPage() {
   };
 
   useEffect(() => {
+    if (mostrarFormulario) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
     const fetchClientes = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -73,13 +81,12 @@ function ContasPage() {
         const data = await res.json();
         setContas(data.contas);
         setClientes(data.Cadastros);
-        console.log(contas);
       } catch (error) {
         console.error("Erro ao buscar clientes:", error);
       }
     };
     fetchClientes();
-  }, []);
+  }, [mostrarFormulario]);
   const contasComCliente = contas.map((conta) => {
     const cliente = clientes.find((c) => c.ID === conta.ID_DEVEDOR);
     return {
@@ -106,6 +113,28 @@ function ContasPage() {
 
     return nomeMatch && statusMatch && dataInicioMatch && dataFimMatch;
   });
+
+  const buscarContaPorId = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/BuscarConta`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+      const dados = await res.json();
+      setParcelas(dados.parcelas);
+    } catch (error) {
+      console.error("Erro ao buscar conta por ID:", error);
+    }
+  };
 
   const salvarNovaConta = async () => {
     const token = localStorage.getItem("token");
@@ -134,15 +163,40 @@ function ContasPage() {
       alert("Erro de conexão.");
     }
   };
+
+  const excluirConta = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
+    try {
+      await fetch("http://localhost:5000/DeleteConta", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      setContas((prevContas) => prevContas.filter((conta) => conta.ID !== id));
+
+      alert("Conta excluída com sucesso!");
+    } catch (erro) {
+      console.error("Erro ao excluir conta:", erro);
+      alert("Não foi possível excluir a conta.");
+    }
+  };
   return (
-    <div className="  min-h-screen flex">
+    <div className="min-h-screen flex overflow-hidden">
       <Sidebar />
-      <div className="flex-1  ms-[30vh]  mx-auto p-32">
+
+      <div className="flex-1  ms-[30vh]  mx-auto p-32  ">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
             Contas
           </h1>
-
           <div className="flex justify-end mb-8">
             <button
               onClick={handleNovaContaClick}
@@ -243,7 +297,10 @@ function ContasPage() {
                   <tr
                     key={conta.ID}
                     className="border-b hover:bg-blue-50 cursor-pointer"
-                    onClick={() => abrirModal(conta)}
+                    onClick={() => {
+                      abrirModal(conta);
+                      buscarContaPorId(conta.ID);
+                    }}
                   >
                     <td className="px-6 py-4">{conta.CLIENTE_NOME}</td>
                     <td className="px-6 py-4">{conta.NOME}</td>
@@ -261,9 +318,9 @@ function ContasPage() {
                     <td className="px-6 py-4">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          conta.STATUS === "PAGO"
+                          conta.STATUS === "PAGA"
                             ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
+                            : "bg-red-500 text-white"
                         }`}
                       >
                         {conta.STATUS}
@@ -276,7 +333,7 @@ function ContasPage() {
         </div>
       </div>
       {mostrarFormulario && (
-        <div className="fixed top-0 right-0 z-50 h-screen w-[80%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-24 ">
+        <div className="fixed top-0 right-0 z-50 h-screen w-[85%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-24 ">
           <div className="   px-6 py-4 flex justify-between items-center">
             <h2 className="text-xl font-bold text-blue-700">Nova Conta</h2>
             <div className="flex justify-end mt-4">
@@ -414,61 +471,159 @@ function ContasPage() {
         </div>
       )}
       {modalAberto && contaSelecionada && (
-        <div className="fixed top-0 right-0 z-50 h-screen w-[85%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-40 overflow-y-auto">
-          <div className="flex justify-between items-start mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Detalhes da Conta
-            </h2>
-          </div>
+        <div className="fixed top-0 right-0 z-50 h-screen w-[85%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-24 ">
+          <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 ">
+            Detalhes da Conta
+          </h1>
 
-          <div className="space-y-4 text-gray-700">
-            <div>
-              <span className="font-semibold"> Cliente:</span>{" "}
-              {contaSelecionada.CLIENTE_NOME}
-            </div>
-            <div>
-              <span className="font-semibold"> Nome:</span>{" "}
-              {contaSelecionada.NOME}
-            </div>
-            <div>
-              <span className="font-semibold"> Descrição:</span>{" "}
-              {contaSelecionada.DESCRICAO}
-            </div>
-            <div>
-              <span className="font-semibold"> Valor Total:</span> R${" "}
-              {parseFloat(contaSelecionada.VALOR_TOTAL).toFixed(2)}
-            </div>
-            <div>
-              <span className="font-semibold"> Parcelas:</span>{" "}
-              {contaSelecionada.NUMERO_PARCELAS}
-            </div>
-            <div>
-              <span className="font-semibold"> Vencimento:</span>{" "}
-              {new Date(contaSelecionada.VENCIMENTO).toLocaleDateString(
-                "pt-BR"
-              )}
-            </div>
-            <div>
-              <span className="font-semibold">🔖 Status:</span>{" "}
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                  contaSelecionada.STATUS === "PAGO"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-yellow-100 text-yellow-700"
-                }`}
-              >
-                {contaSelecionada.STATUS}
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-8 flex justify-end">
+          <div className="mt-8 flex justify-end gap-4">
             <button
               className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
               onClick={() => setModalAberto(false)}
             >
-              Fechar
+              Voltar
             </button>
+
+            <button
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+              onClick={() => setModalExcluirAberto(true)}
+            >
+              Excluir Conta
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-gray-700 text-base">
+            <div>
+              <span className="font-semibold text-gray-900">Nome:</span>{" "}
+              {contaSelecionada.CLIENTE_NOME}
+            </div>
+
+            <div>
+              <span className="font-semibold text-gray-900">
+                Descrição / Conta:
+              </span>{" "}
+              {contaSelecionada.NOME}
+            </div>
+
+            <div>
+              <span className="font-semibold text-gray-900">Valor Total:</span>{" "}
+              R$ {parseFloat(contaSelecionada.VALOR_TOTAL).toFixed(2)}
+            </div>
+
+            <div>
+              <span className="font-semibold text-gray-900">Multa:</span> R${" "}
+              {parseFloat(contaSelecionada.MULTA).toFixed(2)}
+            </div>
+
+            <div>
+              <span className="font-semibold text-gray-900">Juros:</span> R${" "}
+              {parseFloat(contaSelecionada.JUROS).toFixed(2)}
+            </div>
+
+            <div>
+              <span className="font-semibold text-gray-900">Desconto:</span> R${" "}
+              {parseFloat(contaSelecionada.DESCONTO).toFixed(2)}
+            </div>
+
+            <div>
+              <span className="font-semibold text-gray-900">Parcelas:</span>{" "}
+              {contaSelecionada.NUMERO_PARCELAS}
+            </div>
+
+            <div>
+              <span className="font-semibold text-gray-900">Status:</span>{" "}
+              <span className={`px-3 py-1 rounded-full text-xs font-bold  `}>
+                {contaSelecionada.STATUS}
+              </span>
+            </div>
+          </div>
+          <div className="mt-10">
+            <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
+              Parcelas
+            </h1>
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full divide-y divide-blue-100 table-auto text-sm text-left">
+                <thead className="bg-blue-700 text-white">
+                  <tr>
+                    <th className="px-6 py-3 font-semibold">#</th>
+                    <th className="px-6 py-3 font-semibold">Valor</th>
+                    <th className="px-6 py-3 font-semibold">Vencimento</th>
+                    <th className="px-6 py-3 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {parcelas && parcelas.length > 0 ? (
+                    parcelas.map((parcela, index) => (
+                      <tr
+                        key={parcela.ID}
+                        className="border-b hover:bg-blue-50"
+                      >
+                        <td className="px-6 py-4">{index + 1}</td>
+                        <td className="px-6 py-4">
+                          R$ {parseFloat(parcela.VALOR).toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4">
+                          {new Date(parcela.VENCIMENTO).toLocaleDateString(
+                            "pt-BR"
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              parcela.STATUS === "PAGO"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-600 text-white"
+                            }`}
+                          >
+                            {parcela.STATUS}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="4"
+                        className="text-center py-4 text-gray-500"
+                      >
+                        Nenhuma parcela encontrada.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {modalExcluirAberto && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+            <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 ">
+              Confirmar exclusão
+            </h1>
+            <p className="text-gray-600 mb-6">
+              Tem certeza que deseja excluir a conta{" "}
+              <strong>{contaSelecionada.NOME}</strong>? Essa ação não poderá ser
+              desfeita.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                onClick={() => setModalExcluirAberto(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                onClick={() => {
+                  excluirConta(contaSelecionada.ID);
+                  setModalExcluirAberto(false);
+                  setModalAberto(false);
+                }}
+              >
+                Confirmar
+              </button>
+            </div>
           </div>
         </div>
       )}
