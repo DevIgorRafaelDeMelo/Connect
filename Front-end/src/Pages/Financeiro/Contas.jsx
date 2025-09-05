@@ -670,6 +670,11 @@ function ContasPage() {
             </div>
             <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-gray-700 text-base">
               <div>
+                <span className="font-semibold text-gray-900">Tipo:</span>{" "}
+                {contaSelecionada.TIPO}
+              </div>
+
+              <div>
                 <span className="font-semibold text-gray-900">Nome:</span>{" "}
                 {contaSelecionada.CLIENTE_NOME}
               </div>
