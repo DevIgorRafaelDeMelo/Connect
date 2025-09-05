@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../Componets/Sidebar";
 import { FaCog } from "react-icons/fa";
+import QRCode from "qrcode";
+import jsPDF from "jspdf";
 
 function ContasPage() {
   const [contas, setContas] = useState([]);
@@ -14,21 +16,10 @@ function ContasPage() {
   const [modalExcluirAberto, setModalExcluirAberto] = useState(false);
   const [modalQuitarAberto, setModalQuitarAberto] = useState(false);
   const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
-  const [novaConta, setNovaConta] = useState({
-    CLIENTE_NOME: "",
-    DESCRICAO: "",
-    VALOR_TOTAL: "",
-    VALOR_PAGO: "",
-    MULTA: "",
-    JUROS: "",
-    DESCONTO: "",
-    NUMERO_PARCELAS: "",
-    VENCIMENTO: "",
-    TIPO: "",
-    ID_DEVEDOR: "",
-  });
   const [contaSelecionada, setContaSelecionada] = useState(null);
   const [modalAberto, setModalAberto] = useState(false);
+  const [parcelaSelecionada, setParcelaSelecionada] = useState(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
   const TIPOS_DE_DIVIDAS = [
     "Médico",
     "Condomínio",
@@ -51,39 +42,6 @@ function ContasPage() {
     "Taxas públicas (licenciamento, alvarás)",
     "Despesas médicas particulares",
   ];
-
-  const handleNovaContaClick = () => {
-    setMostrarFormulario(true);
-  };
-
-  const abrirModal = (conta) => {
-    setContaSelecionada(conta);
-    setModalAberto(true);
-  };
-
-  useEffect(() => {
-    const fetchClientes = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.warn("Token não encontrado.");
-        return;
-      }
-      try {
-        const res = await fetch(`http://localhost:5000/Contas`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await res.json();
-        setContas(data.contas);
-        setClientes(data.Cadastros);
-      } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
-      }
-    };
-    fetchClientes();
-  }, [contas, modalQuitarAberto, modalExcluirAberto]);
   const contasComCliente = contas.map((conta) => {
     const cliente = clientes.find((c) => c.ID === conta.ID_DEVEDOR);
     return {
@@ -91,7 +49,19 @@ function ContasPage() {
       CLIENTE_NOME: cliente?.CLIENTE_NOME || "Cliente não encontrado",
     };
   });
-
+  const [novaConta, setNovaConta] = useState({
+    CLIENTE_NOME: "",
+    DESCRICAO: "",
+    VALOR_TOTAL: "",
+    VALOR_PAGO: "",
+    MULTA: "",
+    JUROS: "",
+    DESCONTO: "",
+    NUMERO_PARCELAS: "",
+    VENCIMENTO: "",
+    TIPO: "",
+    ID_DEVEDOR: "",
+  });
   const contasFiltradas = contasComCliente.filter((conta) => {
     const nomeMatch = conta.CLIENTE_NOME.toLowerCase().includes(
       filtroNome.toLowerCase()
@@ -110,6 +80,115 @@ function ContasPage() {
 
     return nomeMatch && statusMatch && dataInicioMatch && dataFimMatch;
   });
+
+  const handleEditar = (id) => {
+    const parcela = parcelas.find((p) => p.ID === id);
+    setParcelaSelecionada(parcela);
+    setMostrarModal(true);
+  };
+
+  const gerarPayloadPix = (boleto) => {
+    const valorNumerico = parseFloat(boleto.valor);
+    const valorFormatado = isNaN(valorNumerico)
+      ? "0.00"
+      : valorNumerico.toFixed(2);
+
+    const chavePix = "03081064074";
+    const nome = boleto.cliente || "Cliente";
+    const cidade = "Dois Irmãos";
+
+    return `00020126580014br.gov.bcb.pix0131${chavePix}5204000053039865405${valorFormatado}5802BR5912${nome}6009${cidade}62070503***6304ABCD`;
+  };
+
+  const gerarQRCodePix = async (payload) => {
+    try {
+      const qrCodeDataURL = await QRCode.toDataURL(payload);
+      return qrCodeDataURL;
+    } catch (err) {
+      console.error("Erro ao gerar QR Code:", err);
+      return null;
+    }
+  };
+
+  const gerarPDFBoleto = async (
+    boletoData,
+    qrCodeDataURL,
+    logoDataURL = null
+  ) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    if (logoDataURL) {
+      doc.addImage(logoDataURL, "PNG", pageWidth / 2 - 15, 10, 30, 30);
+    }
+
+    doc.setFont("helvetica");
+    doc.setFontSize(16);
+    doc.text("BOLETO FICTÍCIO", pageWidth / 2, 45, { align: "center" });
+
+    doc.setDrawColor(180);
+    doc.line(20, 50, pageWidth - 20, 50);
+
+    doc.setFontSize(12);
+    const linhas = [
+      `Cliente: ${boletoData.cliente}`,
+      `CPF: 030.810.640-74`,
+      `Parcela ID: ${boletoData.parcelaId}`,
+      `Valor: R$ ${boletoData.valor}`,
+      `Vencimento: ${boletoData.vencimento}`,
+      `Descrição: ${boletoData.descricao || "Pagamento de serviço"}`,
+    ];
+
+    let y = 60;
+    linhas.forEach((linha) => {
+      doc.text(linha, pageWidth / 2, y, { align: "center" });
+      y += 8;
+    });
+
+    doc.setFontSize(12);
+    doc.text("Pagamento via Pix:", pageWidth / 2, y + 10, { align: "center" });
+    if (qrCodeDataURL) {
+      doc.addImage(qrCodeDataURL, "PNG", pageWidth / 2 - 30, y + 15, 60, 60);
+    }
+
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(
+      "Este boleto é fictício e gerado apenas para fins de demonstração.",
+      pageWidth / 2,
+      190,
+      { align: "center" }
+    );
+
+    doc.save("boleto-ficticio.pdf");
+  };
+
+  const handleNovaContaClick = () => {
+    setMostrarFormulario(true);
+  };
+
+  const abrirModal = (conta) => {
+    setContaSelecionada(conta);
+    setModalAberto(true);
+  };
+
+  const handleGerarBoleto = async (parcela) => {
+    const valor = parseFloat(parcela.VALOR).toFixed(2);
+    const vencimento = new Date(parcela.VENCIMENTO).toISOString().split("T")[0];
+
+    const boletoData = {
+      valor,
+      vencimento,
+      cliente: parcela.CLIENTE || "Nome do Cliente",
+      parcelaId: parcela.ID,
+    };
+
+    console.log("Gerando boleto com os dados:", boletoData);
+
+    const payloadPix = gerarPayloadPix(boletoData);
+    const qrCodeDataURL = await gerarQRCodePix(payloadPix);
+    await gerarPDFBoleto(boletoData, qrCodeDataURL);
+  };
 
   const buscarContaPorId = async (id) => {
     const token = localStorage.getItem("token");
@@ -210,11 +289,72 @@ function ContasPage() {
     }
   };
 
-  return (
-    <div className="h-screen flex  ">
-      <Sidebar />
+  const salvarEdicao = async (parcelaAtualizada) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token não encontrado.");
+      return;
+    }
+    try {
+      const res = await fetch("http://localhost:5000/AtualizarConta", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: parcelaAtualizada.ID,
+          VALOR: parcelaAtualizada.VALOR,
+          VENCIMENTO: parcelaAtualizada.VENCIMENTO,
+          STATUS: parcelaAtualizada.STATUS,
+        }),
+      });
 
-      <div className="flex-1  ms-[30vh]  mx-auto p-32  ">
+      if (!res.ok) throw new Error("Erro ao salvar");
+
+      const resultado = await res.json();
+      console.log("Parcela atualizada:", resultado);
+
+      setMostrarModal(false);
+    } catch (error) {
+      console.error("Falha ao salvar edição:", error);
+    }
+  };
+
+  useEffect(() => {
+    const algumModalAberto = modalAberto || mostrarFormulario;
+    if (algumModalAberto) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+    const fetchClientes = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token não encontrado.");
+        return;
+      }
+      try {
+        const res = await fetch(`http://localhost:5000/Contas`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await res.json();
+        setContas(data.contas);
+        setClientes(data.Cadastros);
+      } catch (error) {
+        console.error("Erro ao buscar clientes:", error);
+      }
+    };
+    fetchClientes();
+  }, [contas, modalQuitarAberto, modalExcluirAberto, modalAberto]);
+
+  return (
+    <div className="  flex  ">
+      <Sidebar />
+      <div className="flex-1 ms-[30vh] p-32 h-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
             Contas
@@ -281,8 +421,8 @@ function ContasPage() {
             />
           </div>
         </div>
-        <div className="bg-white shadow-md rounded-lg  ">
-          <table className="min-w-full table-auto">
+        <div className="bg-white shadow-md rounded-lg">
+          <table className="min-w-full table-auto divide-y divide-blue-100">
             <thead className="bg-blue-700 text-white">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold">
@@ -298,20 +438,13 @@ function ContasPage() {
                   Qtd. Parcelas
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold">
-                  Vencimento
+                  Data de lançamento
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold">
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {contas.map((conta) => (
-                <tr key={conta.id} className="border-b hover:bg-blue-50"></tr>
-              ))}
-            </tbody>
-          </table>
-          <table className="min-w-full divide-y divide-blue-100">
             <tbody>
               {contasFiltradas
                 .sort((a, b) => new Date(b.CRIADA_EM) - new Date(a.CRIADA_EM))
@@ -355,7 +488,7 @@ function ContasPage() {
         </div>
       </div>
       {mostrarFormulario && (
-        <div className="fixed top-0 right-0 z-50 h-screen w-[80%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-24 ">
+        <div className="fixed top-0 left-[30vh] right-0 z-50 h-screen bg-white shadow-xl border-l border-gray-200 flex flex-col p-24">
           <div className="   px-6 py-4 flex justify-between items-center">
             <h2 className="text-xl font-bold text-blue-700">Nova Conta</h2>
             <div className="flex justify-end mt-4">
@@ -495,145 +628,177 @@ function ContasPage() {
         </div>
       )}
       {modalAberto && contaSelecionada && (
-        <div className="fixed top-0 right-0 z-50 h-screen w-[80%] bg-white shadow-xl border-l border-gray-200 flex flex-col p-40 overflow-y-auto">
-          <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 ">
-            Detalhes da Conta
-          </h1>
+        <div className="fixed top-0 left-[30vh] right-0 z-50 h-screen overflow-hidden bg-white shadow-xl border-l border-gray-200">
+          <div className="overflow-y-auto h-full p-24 flex flex-col">
+            <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 ">
+              Detalhes da Conta
+            </h1>
 
-          <div className="mt-8 flex justify-end gap-4">
-            <button
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-              onClick={() => setModalAberto(false)}
-            >
-              Voltar
-            </button>
-
-            <div className="relative inline-block text-left">
+            <div className="mt-8 flex justify-end gap-4">
               <button
-                className="p-2 rounded-full hover:bg-gray-200 transition"
-                onClick={() => setMostrarOpcoes(!mostrarOpcoes)}
+                className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                onClick={() => setModalAberto(false)}
               >
-                <FaCog className="h-6 w-6 text-gray-700" />
+                Voltar
               </button>
 
-              {mostrarOpcoes && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
-                  <button
-                    className="w-full text-left px-4 py-2  hover:bg-blue-100"
-                    onClick={() => setModalExcluirAberto(true)}
-                  >
-                    Excluir Conta
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2  hover:bg-blue-100"
-                    onClick={() => setModalQuitarAberto(true)}
-                  >
-                    Quitar Conta
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-gray-700 text-base">
-            <div>
-              <span className="font-semibold text-gray-900">Nome:</span>{" "}
-              {contaSelecionada.CLIENTE_NOME}
-            </div>
+              <div className="relative inline-block text-left">
+                <button
+                  className="p-2 rounded-full hover:bg-gray-200 transition"
+                  onClick={() => setMostrarOpcoes(!mostrarOpcoes)}
+                >
+                  <FaCog className="h-6 w-6 text-gray-700" />
+                </button>
 
-            <div>
-              <span className="font-semibold text-gray-900">
-                Descrição / Conta:
-              </span>{" "}
-              {contaSelecionada.NOME}
+                {mostrarOpcoes && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
+                    <button
+                      className="w-full text-left px-4 py-2  hover:bg-blue-100"
+                      onClick={() => setModalExcluirAberto(true)}
+                    >
+                      Excluir Conta
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2  hover:bg-blue-100"
+                      onClick={() => setModalQuitarAberto(true)}
+                    >
+                      Quitar Conta
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
+            <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-gray-700 text-base">
+              <div>
+                <span className="font-semibold text-gray-900">Nome:</span>{" "}
+                {contaSelecionada.CLIENTE_NOME}
+              </div>
 
-            <div>
-              <span className="font-semibold text-gray-900">Valor Total:</span>{" "}
-              R$ {parseFloat(contaSelecionada.VALOR_TOTAL).toFixed(2)}
-            </div>
+              <div>
+                <span className="font-semibold text-gray-900">
+                  Descrição / Conta:
+                </span>{" "}
+                {contaSelecionada.NOME}
+              </div>
 
-            <div>
-              <span className="font-semibold text-gray-900">Multa:</span> R${" "}
-              {parseFloat(contaSelecionada.MULTA).toFixed(2)}
-            </div>
+              <div>
+                <span className="font-semibold text-gray-900">
+                  Valor Total:
+                </span>{" "}
+                R$ {parseFloat(contaSelecionada.VALOR_TOTAL).toFixed(2)}
+              </div>
 
-            <div>
-              <span className="font-semibold text-gray-900">Juros:</span> R${" "}
-              {parseFloat(contaSelecionada.JUROS).toFixed(2)}
-            </div>
+              <div>
+                <span className="font-semibold text-gray-900">Multa:</span> R${" "}
+                {parseFloat(contaSelecionada.MULTA).toFixed(2)}
+              </div>
 
-            <div>
-              <span className="font-semibold text-gray-900">Desconto:</span> R${" "}
-              {parseFloat(contaSelecionada.DESCONTO).toFixed(2)}
-            </div>
+              <div>
+                <span className="font-semibold text-gray-900">Juros:</span> R${" "}
+                {parseFloat(contaSelecionada.JUROS).toFixed(2)}
+              </div>
 
-            <div>
-              <span className="font-semibold text-gray-900">Parcelas:</span>{" "}
-              {contaSelecionada.NUMERO_PARCELAS}
-            </div>
+              <div>
+                <span className="font-semibold text-gray-900">Desconto:</span>{" "}
+                R$ {parseFloat(contaSelecionada.DESCONTO).toFixed(2)}
+              </div>
 
-            <div>
-              <span className="font-semibold text-gray-900">Status:</span>{" "}
-              <span className={`px-3 py-1 rounded-full text-xs font-bold  `}>
-                {contaSelecionada.STATUS}
-              </span>
+              <div>
+                <span className="font-semibold text-gray-900">Parcelas:</span>{" "}
+                {contaSelecionada.NUMERO_PARCELAS}
+              </div>
+
+              <div>
+                <span className="font-semibold text-gray-900">Status:</span>{" "}
+                <span className={`px-3 py-1 rounded-full text-xs font-bold  `}>
+                  {contaSelecionada.STATUS}
+                </span>
+              </div>
             </div>
-          </div>
-          <div className="mt-10">
-            <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
-              Parcelas
-            </h1>
-            <div className="bg-white shadow-md rounded-lg ">
-              <table className="min-w-full divide-y divide-blue-100 table-auto text-sm text-left">
-                <thead className="bg-blue-700 text-white">
-                  <tr>
-                    <th className="px-6 py-3 font-semibold">#</th>
-                    <th className="px-6 py-3 font-semibold">Valor</th>
-                    <th className="px-6 py-3 font-semibold">Vencimento</th>
-                    <th className="px-6 py-3 font-semibold">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {parcelas && parcelas.length > 0 ? (
-                    parcelas.map((parcela, index) => (
-                      <tr
-                        key={parcela.ID}
-                        className="border-b hover:bg-blue-50"
-                      >
-                        <td className="px-6 py-4">{index + 1}</td>
-                        <td className="px-6 py-4">
-                          R$ {parseFloat(parcela.VALOR).toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4">
-                          {new Date(parcela.VENCIMENTO).toLocaleDateString(
-                            "pt-BR"
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                              parcela.STATUS === "PAGO"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-600 text-white"
-                            }`}
+            <div className="mt-10">
+              <h1 className="text-4xl font-bold text-blue-900 flex items-center gap-3 pb-20">
+                Parcelas
+              </h1>
+              <div className="bg-white shadow-md rounded-lg ">
+                <table className="min-w-full divide-y divide-blue-100 table-auto text-sm text-left">
+                  <thead className="bg-blue-700 text-white">
+                    <tr>
+                      <th className="px-6 py-3 font-semibold">#</th>
+                      <th className="px-6 py-3 font-semibold">Valor</th>
+                      <th className="px-6 py-3 font-semibold">Vencimento</th>
+                      <th className="px-6 py-3 font-semibold">Status</th>
+                      <th className="px-2 py-3 font-semibold text-right w-40 pe-12">
+                        Ações
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parcelas && parcelas.length > 0 ? (
+                      parcelas.map((parcela, index) => {
+                        const valorFormatado = `R$ ${parseFloat(
+                          parcela.VALOR
+                        ).toFixed(2)}`;
+                        const vencimentoValido =
+                          parcela.VENCIMENTO &&
+                          !isNaN(new Date(parcela.VENCIMENTO));
+                        const vencimentoFormatado = vencimentoValido
+                          ? new Date(parcela.VENCIMENTO).toLocaleDateString(
+                              "pt-BR"
+                            )
+                          : "Data inválida";
+
+                        return (
+                          <tr
+                            key={parcela.ID}
+                            className="border-b hover:bg-blue-50"
                           >
-                            {parcela.STATUS}
-                          </span>
+                            <td className="px-6 py-4">{index + 1}</td>
+                            <td className="px-6 py-4">{valorFormatado}</td>
+                            <td className="px-6 py-4">{vencimentoFormatado}</td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                  parcela.STATUS === "PAGO"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-600 text-white"
+                                }`}
+                              >
+                                {parcela.STATUS}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2 text-right whitespace-nowrap">
+                              <div className="inline-flex items-center space-x-2">
+                                <button
+                                  onClick={() => handleEditar(parcela.ID)}
+                                  className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                                >
+                                  Editar
+                                </button>
+                                <span className="text-gray-400 text-xs">|</span>
+                                <button
+                                  onClick={() => handleGerarBoleto(parcela)}
+                                  className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                                >
+                                  Boleto
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="text-center py-4 text-gray-500"
+                        >
+                          Nenhuma parcela encontrada.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="4"
-                        className="text-center py-4 text-gray-500"
-                      >
-                        Nenhuma parcela encontrada.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -697,6 +862,76 @@ function ContasPage() {
                 }}
               >
                 Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {mostrarModal && parcelaSelecionada && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-semibold mb-4">Editar Parcela</h2>
+            <p className="text-2xl font-bold text-blue-600 mb-2">
+              Parcela Nº {parcelaSelecionada.NUMERO_PARCELA}
+            </p>
+
+            <label className="block mb-2 text-sm">Valor:</label>
+            <input
+              type="number"
+              value={parcelaSelecionada.VALOR}
+              onChange={(e) =>
+                setParcelaSelecionada({
+                  ...parcelaSelecionada,
+                  VALOR: e.target.value,
+                })
+              }
+              className="w-full border px-3 py-2 rounded mb-4"
+            />
+
+            <label className="block mb-2 text-sm">Vencimento:</label>
+            <input
+              type="date"
+              value={
+                new Date(parcelaSelecionada.VENCIMENTO)
+                  .toISOString()
+                  .split("T")[0]
+              }
+              onChange={(e) =>
+                setParcelaSelecionada({
+                  ...parcelaSelecionada,
+                  VENCIMENTO: e.target.value,
+                })
+              }
+              className="w-full border px-3 py-2 rounded mb-4"
+            />
+
+            <label className="block mb-2 text-sm">Status:</label>
+            <select
+              value={parcelaSelecionada.STATUS}
+              onChange={(e) =>
+                setParcelaSelecionada({
+                  ...parcelaSelecionada,
+                  STATUS: e.target.value,
+                })
+              }
+              className="w-full border px-3 py-2 rounded mb-4"
+            >
+              <option value="PAGO">PAGO</option>
+              <option value="PENDENTE">PENDENTE</option>
+            </select>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setMostrarModal(false)}
+                className="px-4 py-2 text-sm bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => salvarEdicao(parcelaSelecionada)}
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Salvar
               </button>
             </div>
           </div>
