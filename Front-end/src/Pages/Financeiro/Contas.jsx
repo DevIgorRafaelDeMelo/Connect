@@ -54,9 +54,9 @@ function ContasPage() {
     DESCRICAO: "",
     VALOR_TOTAL: "",
     VALOR_PAGO: "",
-    MULTA: "",
-    JUROS: "",
-    DESCONTO: "",
+    MULTA: "0",
+    JUROS: "0",
+    DESCONTO: "0",
     NUMERO_PARCELAS: "",
     VENCIMENTO: "",
     TIPO: "",
@@ -488,8 +488,8 @@ function ContasPage() {
         </div>
       </div>
       {mostrarFormulario && (
-        <div className="fixed top-0 left-[30vh] right-0 z-50 h-screen bg-white shadow-xl border-l border-gray-200 flex flex-col p-24">
-          <div className="   px-6 py-4 flex justify-between items-center">
+        <div className="fixed top-0 left-[30vh] right-0 z-50 h-screen overflow-y-auto bg-white shadow-xl border-l border-gray-200 p-40">
+          <div className="  flex flex-col ">
             <h2 className="text-xl font-bold text-blue-700">Nova Conta</h2>
             <div className="flex justify-end mt-4">
               <button
@@ -532,6 +532,9 @@ function ContasPage() {
                 ))}
               </datalist>
             </div>
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Tipo
+            </label>
             <select
               value={novaConta.TIPO}
               onChange={(e) =>
@@ -543,10 +546,13 @@ function ContasPage() {
               <option value="RECEBER">Conta a Receber</option>
               <option value="PAGAR">Conta a Pagar</option>
             </select>
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Descrição
+            </label>
             <input
               type="text"
               list="tipos-de-dividas"
-              placeholder="Tipo"
+              placeholder="Descrição"
               value={novaConta.DESCRICAO}
               onChange={(e) =>
                 setNovaConta({ ...novaConta, DESCRICAO: e.target.value })
@@ -559,6 +565,9 @@ function ContasPage() {
                 <option key={index} value={tipo} />
               ))}
             </datalist>
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Valor total
+            </label>
             <input
               type="number"
               placeholder="Valor Total"
@@ -568,6 +577,9 @@ function ContasPage() {
               }
               className="border px-3 py-2 rounded"
             />
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Multa
+            </label>
             <input
               type="number"
               placeholder="Multa"
@@ -577,6 +589,9 @@ function ContasPage() {
               }
               className="border px-3 py-2 rounded"
             />
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Juros ao Mes
+            </label>
             <input
               type="number"
               placeholder="Juros"
@@ -586,6 +601,9 @@ function ContasPage() {
               }
               className="border px-3 py-2 rounded"
             />
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Desconto
+            </label>
             <input
               type="number"
               placeholder="Desconto"
@@ -595,6 +613,9 @@ function ContasPage() {
               }
               className="border px-3 py-2 rounded"
             />
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Parcelas
+            </label>
             <input
               type="number"
               placeholder="Parcelas"
@@ -607,6 +628,9 @@ function ContasPage() {
               }
               className="border px-3 py-2 rounded"
             />
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Data de vencimento
+            </label>
             <input
               type="date"
               value={novaConta.VENCIMENTO}
