@@ -18,6 +18,7 @@ import Administracao from "./Pages/Agenda/Administracao";
 import Feriados from "./Pages/Agenda/Feriados";
 import Contas from "./Pages/Financeiro/Contas";
 import { useAuth } from "./AuthContext/useAuth";
+import Relatorios from "./Pages/Financeiro/Relatorios";
 
 function App() {
   return (
@@ -96,7 +97,6 @@ function App() {
           </RotaProtegida>
         }
       />
-
       <Route
         path="/ClientePageDados/:cpf"
         element={
@@ -142,6 +142,14 @@ function App() {
         element={
           <RotaProtegida>
             <Contas />
+          </RotaProtegida>
+        }
+      />
+      <Route
+        path="/Relatorios"
+        element={
+          <RotaProtegida>
+            <Relatorios />
           </RotaProtegida>
         }
       />
